@@ -26,3 +26,4 @@
 
 ## Literature
 * http://opus.kobv.de/ubp/volltexte/2014/6729/pdf/tbhpi81.pdf
+* http://adamrehn.com/articles/creating-javascript-bindings-for-c-cxx-libraries-with-emscripten
