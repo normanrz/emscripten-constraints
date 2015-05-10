@@ -1,4 +1,9 @@
-var assert = chai.assert;
+try {
+    var assert = require("assert");
+} catch(err) {
+    var assert = chai.assert;
+}
+
 describe('Array', function(){
   describe('#indexOf()', function(){
     it('should return -1 when the value is not present', function(){
