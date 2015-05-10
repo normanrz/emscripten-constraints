@@ -60,7 +60,14 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['chromium-browser'],
+    browsers: ['Chrome'],
+
+    customLaunchers: {
+        Chrome_Travis_CI: {
+            base: 'Chrome',
+            flags: ['--no-sandbox']
+        }
+    },
 
     browserNoActivityTimeout: 60000,
 
@@ -68,4 +75,9 @@ module.exports = function(config) {
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: false
   });
+
+  if(process.env.TRAVIS){
+    config.browsers = ['Chrome_Travis_CI'];
+  }
+
 };
