@@ -1,9 +1,15 @@
 language: node_js
 node_js:
-- '0.12'
+- '0.11'
 
 before_install:
-- 'npm install -g mocha'
+- 'npm install --dev'
+
+before_script:
+- 'cd z3'
+- 'chmod +x generateWrappedZ3.sh'
+- './generateWrappedZ3.sh'
+- '../'
 
 script:
 - 'npm test'
