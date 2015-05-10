@@ -5,6 +5,7 @@
   "devDependencies": {
     "mocha": "~1.4.0",
     "karma": "~0.12.21",
+    "karma-mocha": "~0.1.10",
     "karma-chrome-launcher": "^0.1.10"
   },
   "engines": {
