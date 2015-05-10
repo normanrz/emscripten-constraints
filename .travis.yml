@@ -2,9 +2,6 @@ language: node_js
 node_js:
 - '0.11'
 
-before_install:
-- 'npm install --dev'
-
 before_script:
 - 'cd z3'
 - 'chmod +x generateWrappedZ3.sh'
