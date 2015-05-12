@@ -17,7 +17,6 @@ module.exports = function(config) {
     files: [
       'tests/libs/chai.js',
       'z3/loader.js',
-      'karma.init.js',
       {pattern: 'z3/wrappedZ3.js', included: false},
       {pattern: 'z3/z3.js.mem', included: false},
       'tests/test.*.js'
@@ -38,7 +37,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['dots'],
+    reporters: ['progress'],
 
 
     // web server port

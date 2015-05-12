@@ -1,20 +1,22 @@
-function loadModule(moduleUrl, path) {
+var memoryInitializerPath = null;
+function loadModule(moduleUrl, path, callback) {
     var solverObj = null;
+    memoryInitializerPath = path;
     
     var request = new XMLHttpRequest();
     request.onreadystatechange = function () {
         var DONE = request.DONE || 4;
         if (request.readyState === DONE){
             if (request.status == 200) {
-                console.log("evaluating asmjs code...");
+                debugger
+                console.log("Evaluating asmjs code...");
                 solverObj = new Function(request.responseText)();
-                // console.log("solverObj", solverObj);
+                callback(solverObj);
             } else {
-                console.error("error while loading ", moduleUrl);
+                console.error("Error while loading ", moduleUrl);
             }
         } 
     };
-    request.open("GET", path + moduleUrl, false); // be synchronous
+    request.open("GET", path + moduleUrl);
     request.send();
-    return solverObj;
 }

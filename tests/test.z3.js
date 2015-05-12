@@ -5,7 +5,15 @@ catch(err) {
     var assert = chai.assert;
 }
 
+var z3 = null;
 describe('Z3', function(){
+    before(function(done){
+        this.timeout(20000); // 20s
+        loadModule("wrappedZ3.js", "/base/z3/", function(z3New) {
+            z3 = z3New;
+            done();
+        });
+    }),
     describe('Properties', function(){
         it('Module present in z3', function(){
             assert.isTrue('Module' in z3);
