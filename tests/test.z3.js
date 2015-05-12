@@ -5,6 +5,8 @@ catch(err) {
     var assert = chai.assert;
 }
 
+mocha.setup({globals: ['z3']});
+
 var z3 = null;
 describe('Z3', function(){
     before(function(done){
