@@ -11,7 +11,7 @@ var z3 = null;
 describe('Z3', function(){
     before(function(done){
         this.timeout(20000); // 20s
-        loadModule("wrappedZ3.js", "/base/z3/", function(z3New) {
+        loadModule("wrappedZ3.js", "/z3/", function(z3New) {
             z3 = z3New;
             done();
         });
