@@ -9,7 +9,7 @@ describe('Z3', function(){
     before(function(done){
         var self = this;
         this.timeout(20000); // 20s
-        loadModule("wrappedZ3.js", "/z3/", function(z3) {
+        loadModule("z3.wrapped.js", "/z3/", function(z3) {
             self.z3 = z3;
             done();
         });
