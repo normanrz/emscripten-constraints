@@ -9,10 +9,12 @@
   <script src="libs/jquery.js"></script>
   <script src="libs/mocha.js"></script>
   <script src="libs/chai.js"></script>
+  <script src="../node_modules/cassowary/bin/c.js"></script>
   <script src="../loader.js"></script>
   <script>mocha.setup('bdd')</script>
   <script src="test.z3.js"></script>
   <script src="test.rhea.js"></script>
+  <script src="test.cassowary.js"></script>
   <script>
     mocha.checkLeaks();
     mocha.globals(['jQuery']);

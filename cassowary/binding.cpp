@@ -88,6 +88,16 @@ rhea::constraint createConstraintIneq(rhea::linear_inequality eq1) {
   return rhea::constraint(eq1);
 }
 
+bool constraintIsSatisfied(rhea::constraint c) {
+  return c.is_satisfied();
+}
+bool equationIsSatisfied(rhea::linear_equation c) {
+  return c.is_satisfied();
+}
+bool inequalityIsSatisfied(rhea::linear_inequality c) {
+  return c.is_satisfied();
+}
+
 void solverAddConstraint(rhea::simplex_solver s, rhea::constraint c) {
   s.add_constraint(c);
 }
@@ -132,6 +142,7 @@ EMSCRIPTEN_BINDINGS(my_module)
     ;
 
   class_<rhea::constraint>("Constraint")
+    .function("is_satisfied", &constraintIsSatisfied)
     ;
 
   class_<rhea::linear_expression>("LinearExpression")
@@ -139,8 +150,10 @@ EMSCRIPTEN_BINDINGS(my_module)
     ;
 
   class_<rhea::linear_equation>("LinearEquation")
+    .function("is_satisfied", &equationIsSatisfied)
     ;
   class_<rhea::linear_inequality>("LinearInequality")
+    .function("is_satisfied", &inequalityIsSatisfied)
     ;
 
   class_<rhea::simplex_solver>("SimplexSolver")

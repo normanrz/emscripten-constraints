@@ -1,7 +1,9 @@
 {
   "name": "emscripten-constraints",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "cassowary": "0.0.2"
+  },
   "devDependencies": {
     "mocha": "~1.4.0",
     "karma": "~0.12.21",
