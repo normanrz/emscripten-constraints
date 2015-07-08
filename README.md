@@ -17,9 +17,11 @@
 * Toolchain for Compilation
 
 ### Babelsberg API requirements
-* `always(opts, func)`
-* `contraintVariableFor(object, property)`
-* `solve()`
+* `Solver#always(opts, func) : Constraint` Not much to do, just setting up the `Constraint` object from Babelsberg Core. Also store the constraint. You'll need it for solving.
+* `Solver#contraintVariableFor(object, property) : Variable` Create your own external Variable object store it. You will need it for solving.
+* `Solver#solveOnce(constraint)` Gives you a new constraint (e.g. new position of rect) and you should solve. 
+* `Solver#solve()` Solve
+* `Variable#suggestValue(value)`
 
 ## References
 * http://emscripten.org

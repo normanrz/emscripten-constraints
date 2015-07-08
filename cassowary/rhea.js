@@ -41954,5 +41954,4 @@ run();
 
 // {{MODULE_ADDITIONS}}
 
-console.log(Module.test(100));
-
+return { Module : Module, FS : FS};
