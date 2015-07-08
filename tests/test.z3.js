@@ -5,23 +5,21 @@ catch(err) {
     var assert = chai.assert;
 }
 
-mocha.setup({globals: ['z3']});
-
-var z3 = null;
 describe('Z3', function(){
     before(function(done){
+        var self = this;
         this.timeout(20000); // 20s
-        loadModule("wrappedZ3.js", "/z3/", function(z3New) {
-            z3 = z3New;
+        loadModule("wrappedZ3.js", "/z3/", function(z3) {
+            self.z3 = z3;
             done();
         });
     }),
     describe('Properties', function(){
         it('Module present in z3', function(){
-            assert.isTrue('Module' in z3);
+            assert.isTrue('Module' in this.z3);
         })
         it('FS present in z3', function(){
-            assert.isTrue('FS' in z3);
+            assert.isTrue('FS' in this.z3);
         })
     })
 })

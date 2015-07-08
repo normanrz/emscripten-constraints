@@ -12,11 +12,8 @@
   <script src="../z3/loader.js"></script>
   <script>mocha.setup('bdd')</script>
   <script src="test.z3.js"></script>
+  <script src="test.rhea.js"></script>
   <script>
-    var z3 = loadModule("wrappedZ3.js", "/z3/", function(solverObj) {
-      console.log("solverObj", solverObj);
-    });
-
     mocha.checkLeaks();
     mocha.globals(['jQuery']);
     mocha.run();
