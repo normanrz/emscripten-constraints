@@ -9,7 +9,10 @@ describe('Z3', function(){
     before(function(done){
         var self = this;
         this.timeout(20000); // 20s
+        console.time("load z3");
         loadModule("z3.wrapped.js", "/z3/", function(z3) {
+            // 6371 ms
+            console.timeEnd("load z3");
             self.z3 = z3;
             var memFileTimeOut = 1000;
             setTimeout(done, memFileTimeOut);
@@ -64,7 +67,13 @@ describe('Z3', function(){
             }
 
             // window.runIt = run.bind(null, problem);
-            var solution = run(problem);
+            // 185.65 ms per solution
+            console.time("z3 solving");
+            var iterations = 1;
+            for (var i = 0; i <= iterations; i++) {
+                var solution = run(problem);
+            };
+            console.timeEnd("z3 solving");
 
             assert.isTrue(solution.indexOf("top0 500.0") > -1);
             assert.isTrue(solution.indexOf("top1 500.0") > -1);
