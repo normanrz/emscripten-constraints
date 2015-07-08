@@ -18,6 +18,9 @@ emmake make
 ```
 emcc -c -std=c++11 -I. binding.cpp -o binding.bc
 emcc --bind rhea/librhea.so binding.bc -o rhea.js
-echo "console.log(Module.test(100));" >> rhea.js
-node rhea.js
+```
+
+## Generate Wrapper
+```
+./generateWrapper.sh rhea.js rhea.wrapped.js
 ```

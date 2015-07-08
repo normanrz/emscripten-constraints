@@ -5,33 +5,29 @@ catch(err) {
     var assert = chai.assert;
 }
 
-mocha.setup({globals: ['z3', "Module"]});
-
-var z3 = null;
 describe('Z3', function(){
     before(function(done){
+        var self = this;
         this.timeout(20000); // 20s
-
-        loadModule("wrappedZ3.js", "/z3/", function(z3New) {
-            z3 = z3New;
+        loadModule("z3.wrapped.js", "/z3/", function(z3) {
+            self.z3 = z3;
             var memFileTimeOut = 1000;
             setTimeout(done, memFileTimeOut);
         });
-
     });
 
     describe('Properties', function(){
         it('Module present in z3', function(){
-            assert.isTrue('Module' in z3);
+            assert.isTrue('Module' in this.z3);
         })
         it('FS present in z3', function(){
-            assert.isTrue('FS' in z3);
+            assert.isTrue('FS' in this.z3);
         })
     });
 
-    describe('Z3 solving', function() {
+    describe('Solving', function() {
         it('should solve simple constraints', function() {
-
+            var self = this;
             var problem = [
                 "(declare-fun top0 () Real)",
                 "(declare-fun top1 () Real)",
@@ -52,14 +48,14 @@ describe('Z3', function(){
                     oldConsoleLog.apply(console, arguments);
                 }
 
-                z3.FS.createDataFile("/", fileName, "(check-sat) " + problem, !0, !0);
+                self.z3.FS.createDataFile("/", fileName, "(check-sat) " + problem, !0, !0);
 
                 try {
-                    z3.Module.callMain(["-smt2", "/" + fileName])
+                    self.z3.Module.callMain(["-smt2", "/" + fileName])
                 } catch (exception) {
                     console.error("exception", exception);
                 } finally {
-                    z3.FS.unlink("/" + fileName)
+                    self.z3.FS.unlink("/" + fileName)
                 }
 
                 window.console.log = oldConsoleLog;
