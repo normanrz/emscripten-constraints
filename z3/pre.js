@@ -1,3 +1,5 @@
+console.log("defining Module...");
+
 var fileName = "problem.smt2";
 
 var Module = {
