@@ -1,21 +1,14 @@
-try {
-    var assert = require("assert");
-}
-catch(err) {
-    var assert = chai.assert;
-}
-
 describe('Z3', function(){
     before(function(done){
         var self = this;
         this.timeout(20000); // 20s
         console.time("load z3");
-        loadModule("z3.wrapped.js", "/z3/", function(z3) {
-            // 6371 ms
-            console.timeEnd("load z3");
+        require(['../z3/module.z3'], function (loadZ3) {
+          loadZ3(function(z3) {
+            console.timeEnd("successfully loaded z3");
             self.z3 = z3;
-            var memFileTimeOut = 1000;
-            setTimeout(done, memFileTimeOut);
+            done();
+          })
         });
     });
 
@@ -39,44 +32,36 @@ describe('Z3', function(){
                 "(check-sat) (get-value (top0 top1))"
             ].join(" ");
 
-            function run(problem, fileName) {
-                if (!fileName) {
-                    fileName = "problem.smt2";
-                }
-
-                var oldConsoleLog = console.log;
-                var stdout = [];
-                window.console.log = function(solution) {
-                    stdout.push(solution);
-                    oldConsoleLog.apply(console, arguments);
-                }
-
-                self.z3.FS.createDataFile("/", fileName, "(check-sat) " + problem, !0, !0);
-
-                try {
-                    self.z3.Module.callMain(["-smt2", "/" + fileName])
-                } catch (exception) {
-                    console.error("exception", exception);
-                } finally {
-                    self.z3.FS.unlink("/" + fileName)
-                }
-
-                window.console.log = oldConsoleLog;
-
-                return stdout.join("")
-            }
-
-            // window.runIt = run.bind(null, problem);
-            // 185.65 ms per solution
-            console.time("z3 solving");
-            var iterations = 1;
-            for (var i = 0; i <= iterations; i++) {
-                var solution = run(problem);
-            };
-            console.timeEnd("z3 solving");
+            var solution = this.z3.solveProblem(problem);
 
             assert.isTrue(solution.indexOf("top0 500.0") > -1);
             assert.isTrue(solution.indexOf("top1 500.0") > -1);
         })
+    });
+
+    describe("API Layer", function() {
+        it("should be able to construct the problem description", function() {
+            var z3 = this.z3;
+            var c = z3.c;
+
+            var v1 = new c.Variable();
+            var v2 = new c.Variable();
+            // v1 >= v2
+            var ineq1 = new c.Inequality(v1, c.GEQ, v2);
+
+            var e1 = c.minus(v1, 1);
+            // v1 - 1 = v2
+            var eq1 = new c.Equation(e1, v2);
+            var s1 = new c.SimplexSolver();
+            s1.addConstraint(eq1);
+            s1.addConstraint(ineq1);
+
+            s1.solve();
+
+            assert.isTrue(v1.value >= v2.value);
+            assert.isTrue(v1.value - 1 === v2.value);
+        })
     })
+
 })
+
