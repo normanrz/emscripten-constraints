@@ -1,14 +1,18 @@
 describe("Rhea", function(){
   before(function(done){
-    loadModule("rhea.wrapped.js", "/cassowary/", function (rhea) {
-      this.rhea = rhea;
-      this.deleteAll = function () {
-        for (var i = 0; i < arguments.length; i++) {
-          arguments[i].delete();
+    this.timeout(20000); // 20s
+    var _this = this;
+    require(["../loader"], function(loadModule) {
+      loadModule("rhea.wrapped.js", "/cassowary/", function (rhea) {
+        _this.rhea = rhea;
+        _this.deleteAll = function () {
+          for (var i = 0; i < arguments.length; i++) {
+            arguments[i].delete();
+          }
         }
-      }
-      done();
-    }.bind(this));
+        done();
+      });
+    });
   });
   describe('Properties', function () {
     it('Module present in rhea', function () {
