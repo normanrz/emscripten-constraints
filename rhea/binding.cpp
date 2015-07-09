@@ -7,7 +7,7 @@
 
 using namespace emscripten;
 
-rhea::linear_expression createExpressionVarVar(rhea::variable v1, std::string op, rhea::variable v2) {
+rhea::linear_expression createExpressionVarVar(rhea::variable &v1, std::string op, rhea::variable &v2) {
   if (op == "+") {
     return rhea::linear_expression(v1 + v2);
   } else {
@@ -15,7 +15,7 @@ rhea::linear_expression createExpressionVarVar(rhea::variable v1, std::string op
   }
 }
 
-rhea::linear_expression createExpressionVarConst(rhea::variable v1, std::string op, double v2) {
+rhea::linear_expression createExpressionVarConst(rhea::variable &v1, std::string op, double v2) {
   if (op == "+") {
     return rhea::linear_expression(v1 + v2);
   } else if (op == "-") {
@@ -27,7 +27,7 @@ rhea::linear_expression createExpressionVarConst(rhea::variable v1, std::string 
   }
 }
 
-rhea::linear_expression createExpressionConstVar(double v1, std::string op, rhea::variable v2) {
+rhea::linear_expression createExpressionConstVar(double v1, std::string op, rhea::variable &v2) {
   if (op == "+") {
     return rhea::linear_expression(v1 + v2);
   } else if (op == "-") {
@@ -37,57 +37,66 @@ rhea::linear_expression createExpressionConstVar(double v1, std::string op, rhea
   }
 }
 
-rhea::linear_equation createEquationExpVar(rhea::linear_expression e1, rhea::variable v2) {
+rhea::linear_equation createEquationExpVar(rhea::linear_expression &e1, rhea::variable &v2) {
   return rhea::linear_equation(e1 == v2);
 }
-rhea::linear_equation createEquationExpExp(rhea::linear_expression e1, rhea::linear_expression e2) {
+rhea::linear_equation createEquationExpExp(rhea::linear_expression &e1, rhea::linear_expression &e2) {
   return rhea::linear_equation(e1 == e2);
 }
-rhea::linear_equation createEquationVarExp(rhea::variable e1, rhea::linear_expression e2) {
+rhea::linear_equation createEquationVarExp(rhea::variable &e1, rhea::linear_expression &e2) {
   return rhea::linear_equation(e1 == e2);
 }
-rhea::linear_equation createEquationVarVar(rhea::variable v1, rhea::variable v2) {
+rhea::linear_equation createEquationVarVar(rhea::variable &v1, rhea::variable &v2) {
   return rhea::linear_equation(v1 == v2);
 }
-rhea::linear_equation createEquationVarConst(rhea::variable v1, double e2) {
+rhea::linear_equation createEquationVarConst(rhea::variable &v1, double e2) {
   return rhea::linear_equation(v1 == e2);
 }
 
-rhea::linear_inequality createInequalityExpExp(rhea::linear_expression e1, std::string op, rhea::linear_expression e2) {
+rhea::linear_inequality createInequalityExpExp(rhea::linear_expression &e1, std::string op, rhea::linear_expression &e2) {
   return op == "<=" ? e1 <= e2 : e1 >= e2;
 }
-rhea::linear_inequality createInequalityVarExp(rhea::variable e1, std::string op, rhea::linear_expression e2) {
+rhea::linear_inequality createInequalityVarExp(rhea::variable &e1, std::string op, rhea::linear_expression &e2) {
   return op == "<=" ? e1 <= e2 : e1 >= e2;
 }
-rhea::linear_inequality createInequalityVarVar(rhea::variable e1, std::string op, rhea::variable e2) {
+rhea::linear_inequality createInequalityVarVar(rhea::variable &e1, std::string op, rhea::variable &e2) {
   return op == "<=" ? e1 <= e2 : e1 >= e2;
 }
-rhea::linear_inequality createInequalityVarConst(rhea::variable e1, std::string op, double e2) {
+rhea::linear_inequality createInequalityVarConst(rhea::variable &e1, std::string op, double e2) {
   return op == "<=" ? e1 <= e2 : e1 >= e2;
 }
 
-rhea::constraint createConstraintEq(rhea::linear_equation eq1) {
+rhea::constraint createConstraintEq(rhea::linear_equation &eq1) {
   return rhea::constraint(eq1);
 }
-rhea::constraint createConstraintIneq(rhea::linear_inequality eq1) {
+rhea::constraint createConstraintIneq(rhea::linear_inequality &eq1) {
   return rhea::constraint(eq1);
 }
 
-bool constraintIsSatisfied(rhea::constraint c) {
+bool constraintIsSatisfied(rhea::constraint &c) {
   return c.is_satisfied();
 }
-bool equationIsSatisfied(rhea::linear_equation c) {
+bool equationIsSatisfied(rhea::linear_equation &c) {
   return c.is_satisfied();
 }
-bool inequalityIsSatisfied(rhea::linear_inequality c) {
+bool inequalityIsSatisfied(rhea::linear_inequality &c) {
   return c.is_satisfied();
 }
 
-void solverAddConstraint(rhea::simplex_solver &s, rhea::constraint c) {
+void solverAddConstraint(rhea::simplex_solver &s, rhea::constraint &c) {
   s.add_constraint(c);
 }
-void solverSuggest(rhea::simplex_solver &s, rhea::variable v1, double x) {
+void solverAddStay(rhea::simplex_solver &s, rhea::variable &v) {
+  s.add_stay(v);
+}
+void solverAddEditVar(rhea::simplex_solver &s, rhea::variable &v) {
+  s.add_edit_var(v);
+}
+void solverSuggest(rhea::simplex_solver &s, rhea::variable &v1, double x) {
   s.suggest(v1, x);
+}
+void solverSuggestValue(rhea::simplex_solver &s, rhea::variable &v1, double x) {
+  s.suggest_value(v1, x);
 }
 void solverSolve(rhea::simplex_solver &s) {
   s.solve();
@@ -145,10 +154,6 @@ EMSCRIPTEN_BINDINGS(my_module)
   function("createConstraintEq", &createConstraintEq);
   function("createConstraintIneq", &createConstraintIneq);
 
-  function("solverAddConstraint", &solverAddConstraint);
-  function("solverSuggest", &solverSuggest);
-  function("solverSolve", &solverSolve);
-
   class_<rhea::variable>("Variable")
     .constructor<>()
     .constructor<double>()
@@ -174,9 +179,13 @@ EMSCRIPTEN_BINDINGS(my_module)
   class_<rhea::simplex_solver>("SimplexSolver")
     .constructor<>()
     .function("add_constraint", &solverAddConstraint)
+    .function("add_stay", &solverAddStay)
+    .function("add_edit_var", &solverAddEditVar)
     .function("suggest", &solverSuggest)
+    .function("suggest_value", &solverSuggestValue)
     .function("solve", &solverSolve)
+    .function("begin_edit", &rhea::simplex_solver::begin_edit)
+    .function("end_edit", &rhea::simplex_solver::end_edit)
     ;
 }
-
 
