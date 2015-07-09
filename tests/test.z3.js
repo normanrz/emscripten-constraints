@@ -1,7 +1,7 @@
 describe('Z3', function(){
+    this.timeout("20s");
     before(function(done){
         var self = this;
-        this.timeout(20000); // 20s
         console.time("load z3");
         require(['../z3/module.z3'], function (loadZ3) {
           loadZ3(function(z3) {
@@ -36,7 +36,56 @@ describe('Z3', function(){
 
             assert.isTrue(solution.indexOf("top0 500.0") > -1);
             assert.isTrue(solution.indexOf("top1 500.0") > -1);
-        })
+        });
+
+        it("should solve a complex constraint set", function () {
+          var z3 = this.z3;
+          var c = z3.c;
+          this._runnable.title += ": " + perfTest(function () {
+
+            var mouseLocationY = new c.Variable({ value: 10 });
+            var temperature = new c.Variable();
+            var mercuryTop = new c.Variable();
+            var mercuryBottom = new c.Variable();
+            var thermometerTop = new c.Variable();
+            var thermometerBottom = new c.Variable();
+            var grayTop = new c.Variable();
+            var grayBottom = new c.Variable();
+            var whiteTop = new c.Variable();
+            var whiteBottom = new c.Variable();
+            var displayNumber = new c.Variable();
+
+            var constraints = [
+              new c.Equation(temperature, mercuryTop),
+              new c.Equation(whiteTop, thermometerTop),
+              new c.Equation(whiteBottom, mercuryTop),
+              new c.Equation(grayTop, mercuryTop),
+              new c.Equation(grayBottom, mercuryBottom),
+              new c.Equation(displayNumber, temperature),
+              new c.Equation(mercuryTop, mouseLocationY),
+              new c.Inequality(mercuryTop, c.LEQ, thermometerTop),
+              new c.Equation(mercuryBottom, thermometerBottom)
+            ];
+
+            var solver = new c.SimplexSolver();
+            // solver.addStay(mouseLocationY);
+            // solver.addEditVar(mouseLocationY);
+            constraints.forEach(function(constraint) {
+              solver.addConstraint(constraint);
+            })
+            solver.solve();
+
+            assert.equal(temperature.value, mercuryTop.value);
+            assert.equal(whiteTop.value, thermometerTop.value);
+            assert.equal(whiteBottom.value, mercuryTop.value);
+            assert.equal(grayTop.value, mercuryTop.value);
+            assert.equal(grayBottom.value, mercuryBottom.value);
+            assert.equal(displayNumber.value, temperature.value);
+            assert.equal(mercuryTop.value, mouseLocationY.value);
+            assert.isTrue(mercuryTop.value <= thermometerTop.value);
+            assert.equal(mercuryBottom.value, thermometerBottom.value);
+          }.bind(this), 10);
+        });
     });
 
     describe("API Layer", function() {

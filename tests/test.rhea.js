@@ -1,10 +1,6 @@
-describe("Rhea", function() {
-  require(['../rhea/module.rhea'], function (loadRhea) {
-    loadRhea(function(rhea) {
-    
-      before(function () {
-        this.timeout(20000); // 20s
-      });
+require(['../rhea/module.rhea'], function (loadRhea) {
+  loadRhea(function(rhea) {
+    describe("Rhea", function() {
 
       beforeEach(function () {
         this.rc = new rhea.ReferenceCounterRoot();
@@ -224,7 +220,7 @@ describe("Rhea", function() {
 
 
 
-  
+
       describe("Run - New API", function () {
 
         it("should create a Variable", function () {
@@ -326,7 +322,7 @@ describe("Rhea", function() {
 
           this.rc.add(c1, c2);
         });
-        
+
         it("should create a solver", function () {
           var v1 = new rhea.Variable({ value: 1 });
           var eq1 = new rhea.Equation(v1, 2);
@@ -369,11 +365,11 @@ describe("Rhea", function() {
         it("should solve multiple constraints", function () {
           var v1 = new rhea.Variable();
           var v2 = new rhea.Variable();
-          
+
           // v1 - 1 == v2
           var e1 = rhea.minus(v1, 1);
           var eq1 = new rhea.Equation(e1, v2);
-          
+
           // v1 >= 2
           var eq2 = new rhea.Inequality(v1, ">=", 2);
 
@@ -393,11 +389,11 @@ describe("Rhea", function() {
           this._runnable.title += ": " + perfTest(function () {
             var v1 = new rhea.Variable();
             var v2 = new rhea.Variable();
-            
+
             // v1 - 1 == v2
             var e1 = rhea.minus(v1, 1);
             var eq1 = new rhea.Equation(e1, v2);
-            
+
             // v1 >= 2
             var eq2 = new rhea.Inequality(v1, ">=", 2);
 

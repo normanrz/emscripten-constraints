@@ -17,6 +17,7 @@
   <script src="test.rhea.js"></script>
   <script src="test.z3.js"></script>
   <script>
+    mocha.timeout(20000);
     mocha.checkLeaks();
     mocha.globals(['jQuery']);
     mocha.run();
