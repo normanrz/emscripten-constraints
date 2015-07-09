@@ -83,13 +83,13 @@ bool inequalityIsSatisfied(rhea::linear_inequality c) {
   return c.is_satisfied();
 }
 
-void solverAddConstraint(rhea::simplex_solver s, rhea::constraint c) {
+void solverAddConstraint(rhea::simplex_solver &s, rhea::constraint c) {
   s.add_constraint(c);
 }
-void solverSuggest(rhea::simplex_solver s, rhea::variable v1, double x) {
+void solverSuggest(rhea::simplex_solver &s, rhea::variable v1, double x) {
   s.suggest(v1, x);
 }
-void solverSolve(rhea::simplex_solver s) {
+void solverSolve(rhea::simplex_solver &s) {
   s.solve();
 }
 
