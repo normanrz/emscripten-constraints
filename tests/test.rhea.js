@@ -5,18 +5,29 @@ catch(err) {
   var assert = chai.assert;
 }
 
+function perfTest(runner, runs) {
+  if (typeof runs == "undefined") {
+    runs = 100;
+  }
+  var start = performance.now();
+  for(var i = 0; i < runs; i++) {
+    runner();
+  }
+  return (performance.now() - start) / runs;
+}
+
+
 describe("Rhea", function(){
   before(function(done){
-    var self = this;
     loadModule("rhea.wrapped.js", "/cassowary/", function (rhea) {
-      self.rhea = rhea;
-      self.deleteAll = function () {
+      this.rhea = rhea;
+      this.deleteAll = function () {
         for (var i = 0; i < arguments.length; i++) {
           arguments[i].delete();
         }
       }
       done();
-    });
+    }.bind(this));
   });
   describe('Properties', function () {
     it('Module present in rhea', function () {
@@ -25,7 +36,11 @@ describe("Rhea", function(){
   });
   describe("Run", function () {
     it("should run test function", function () {
-      this.rhea.Module.test(1);
+      // v1 - 1 == v2, v1 >= 2
+      var res = this.rhea.Module.test();
+      console.log(res.get(0), res.get(1));
+      assert.isTrue(res.get(0) - 1 == res.get(1));
+      assert.isTrue(res.get(0) >= 2);
     });
     it("should create a Variable", function () {
       var v1 = new this.rhea.Module.Variable(12);
@@ -187,6 +202,32 @@ describe("Rhea", function(){
       assert.isTrue(v1.value() >= 2);
 
       this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
+    });
+
+    it("should benchmark solving multiple constraints", function () {
+      this._runnable.title += ": " + perfTest(function () {
+        var v1 = new this.rhea.Module.Variable();
+        var v2 = new this.rhea.Module.Variable();
+        
+        // v1 - 1 == v2
+        var e1 = this.rhea.Module.createExpressionVarConst(v1, "-", 1);
+        var eq1 = this.rhea.Module.createEquationExpVar(e1, v2);
+        var c1 = this.rhea.Module.createConstraintEq(eq1);
+        
+        // v1 >= 2
+        var eq2 = this.rhea.Module.createInequalityVarConst(v1, ">=", 2);
+        var c2 = this.rhea.Module.createConstraintIneq(eq2);
+
+        var s1 = new this.rhea.Module.SimplexSolver();
+        s1.add_constraint(c1);
+        s1.add_constraint(c2);
+        s1.solve();
+
+        // assert.isTrue(v1.value() - 1 == v2.value())
+        // assert.isTrue(v1.value() >= 2);
+
+        this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
+      }.bind(this));
     });
 
 

@@ -6,21 +6,6 @@
 #include <string>
 
 using namespace emscripten;
-  
-double test(double a) {
-  rhea::variable v1(1), v2(2);
-  rhea::simplex_solver solver;
-
-  solver.add_constraints({
-    v1 + 1 == v2,
-    v2 >= 3
-  });
-  solver.solve();
-
-  std::cout << v1.value() << "," << v2.value();
-
-  return v1.value();
-}
 
 rhea::linear_expression createExpressionVarVar(rhea::variable v1, std::string op, rhea::variable v2) {
   if (op == "+") {
@@ -108,8 +93,38 @@ void solverSolve(rhea::simplex_solver s) {
   s.solve();
 }
 
+
+
+std::vector<double> test() {
+  rhea::variable v1, v2;
+  rhea::simplex_solver solver;
+  
+  // v1 - 1 == v2
+  rhea::linear_expression e1 = createExpressionVarConst(v1, "-", 1);
+  rhea::linear_equation eq1 = createEquationExpVar(e1, v2);
+  rhea::constraint c1 = createConstraintEq(eq1);
+  
+  // v1 >= 2
+  rhea::linear_inequality eq2 = createInequalityVarConst(v1, ">=", 2);
+  rhea::constraint c2 = createConstraintIneq(eq2);
+
+  solverAddConstraint(solver, c1);
+  solverAddConstraint(solver, c2);
+  solverSolve(solver);
+
+  // solver.add_constraints({
+  //   v1 - 1 == v2,
+  //   v1 >= 2
+  // });
+  // solver.solve();
+
+  return std::vector<double> { v1.value(), v2.value() };
+}
+
+
 EMSCRIPTEN_BINDINGS(my_module)
 {
+  register_vector<double>("VectorDouble");
   function("test", &test);
 
   function("createExpressionVarVar", &createExpressionVarVar);
