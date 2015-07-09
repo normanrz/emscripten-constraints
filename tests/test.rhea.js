@@ -24,13 +24,13 @@ function ReferenceCounterRoot () {
       arguments[i].rc.increment();
       children.push(arguments[i]);
     }
-  }
+  };
   this.deleteAll = function () {
     children.forEach(function (child) {
       child.delete();
     });
     children = [];
-  }
+  };
 }
 
 
@@ -225,12 +225,53 @@ describe("Rhea", function () {
               this.rc.add(c);
             } else if (isEquation(c) || isInequality(c)) {
               this.addConstraint(new Constraint(c));
+            } else {
+              throw new TypeError("Invalid arguments");
             }
-          }
+          };
 
-          this.solve = function () {
-            solver.solve();
-          }
+          this.addConstraints = function (constraints) {
+            for(var i = 0; i < constraints.length; i++) {
+              this.addConstraint(constraints[i]);
+            }
+          };
+
+          this.addStay = function (v) {
+            if (isVariable(v)) {
+              solver.add_stay(v.base);
+            } else {
+              throw new TypeError("Invalid arguments");
+            }
+          };
+
+          this.addEditVar = function (v) {
+            if (isVariable(v)) {
+              solver.add_edit_var(v.base);
+            } else {
+              throw new TypeError("Invalid arguments");
+            }
+          };
+
+          this.solve = function () { solver.solve(); };
+          this.beginEdit = function () { solver.begin_edit(); };
+          this.endEdit = function () { solver.end_edit(); };
+
+          this.suggest = function (v, value) {
+            if (isVariable(v)) {
+              solver.suggest(v.base, value);
+            } else {
+              throw new TypeError("Invalid arguments");
+            }
+          };
+
+          this.suggestValue = function (v, value) {
+            if (isVariable(v)) {
+              solver.suggest_value(v.base, value);
+            } else {
+              throw new TypeError("Invalid arguments");
+            }
+          };
+
 
           Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: solver });
         }
@@ -648,26 +689,95 @@ describe("Rhea", function () {
 
     it("should benchmark solving multiple constraints", function () {
       this._runnable.title += ": " + perfTest(function () {
-      var v1 = new this.r.Variable();
-      var v2 = new this.r.Variable();
-      
-      // v1 - 1 == v2
-      var e1 = this.r.minus(v1, 1);
-      var eq1 = new this.r.Equation(e1, v2);
-      
-      // v1 >= 2
-      var eq2 = new this.r.Inequality(v1, ">=", 2);
+        var v1 = new this.r.Variable();
+        var v2 = new this.r.Variable();
+        
+        // v1 - 1 == v2
+        var e1 = this.r.minus(v1, 1);
+        var eq1 = new this.r.Equation(e1, v2);
+        
+        // v1 >= 2
+        var eq2 = new this.r.Inequality(v1, ">=", 2);
 
-      var s1 = new this.r.SimplexSolver();
-      s1.addConstraint(eq1);
-      s1.addConstraint(eq2);
-      s1.solve();
+        var s1 = new this.r.SimplexSolver();
+        s1.addConstraint(eq1);
+        s1.addConstraint(eq2);
+        s1.solve();
 
-      console.log(v1.value, v2.value);
-      assert.isTrue(v1.value - 1 == v2.value);
-      assert.isTrue(v1.value >= 2);
+        console.log(v1.value, v2.value);
+        assert.isTrue(v1.value - 1 == v2.value);
+        assert.isTrue(v1.value >= 2);
 
-      this.rc.add(s1);
+        this.rc.add(s1);
+      }.bind(this));
+    });
+
+    it("should solve a complex constraint set", function () {
+      this._runnable.title += ": " + perfTest(function () {
+        var c = this.r;
+
+        var mouseLocationY = new c.Variable({ value: 10 });
+        var temperature = new c.Variable({ value: 0 });
+        var mercuryTop = new c.Variable({ value: 0 });
+        var mercuryBottom = new c.Variable({ value: 0 });
+        var thermometerTop = new c.Variable({ value: 0 });
+        var thermometerBottom = new c.Variable({ value: 0 });
+        var grayTop = new c.Variable({ value: 0 });
+        var grayBottom = new c.Variable({ value: 0 });
+        var whiteTop = new c.Variable({ value: 0 });
+        var whiteBottom = new c.Variable({ value: 0 });
+        var displayNumber = new c.Variable({ value: 0 });
+
+        var constraints = [
+          new c.Equation(temperature, mercuryTop),
+          new c.Equation(whiteTop, thermometerTop),
+          new c.Equation(whiteBottom, mercuryTop),
+          new c.Equation(grayTop, mercuryTop),
+          new c.Equation(grayBottom, mercuryBottom),
+          new c.Equation(displayNumber, temperature),
+          new c.Equation(mercuryTop, mouseLocationY),
+          new c.Inequality(mercuryTop, c.LEQ, thermometerTop),
+          new c.Equation(mercuryBottom, thermometerBottom)
+        ];
+
+        var solver = new c.SimplexSolver();
+        solver.addStay(mouseLocationY);
+        solver.addEditVar(mouseLocationY);
+        constraints.forEach(function (c) {
+          solver.addConstraint(c);
+        });
+        solver.solve();
+
+        assert.equal(mouseLocationY.value, 10);
+        assert.equal(temperature.value, 10);
+        assert.equal(mercuryTop.value, 10);
+        assert.equal(mercuryBottom.value, 0);
+        assert.equal(thermometerTop.value, 10);
+        assert.equal(thermometerBottom.value, 0);
+        assert.equal(grayTop.value, 10);
+        assert.equal(grayBottom.value, 0);
+        assert.equal(whiteTop.value, 10);
+        assert.equal(whiteBottom.value, 10);
+        assert.equal(displayNumber.value, 10);
+
+        solver.beginEdit();
+        solver.suggestValue(mouseLocationY, 12);
+        solver.endEdit();
+
+        assert.equal(mouseLocationY.value, 12);
+        assert.equal(temperature.value, 12);
+        assert.equal(mercuryTop.value, 12);
+        assert.equal(mercuryBottom.value, 0);
+        assert.equal(thermometerTop.value, 12);
+        assert.equal(thermometerBottom.value, 0);
+        assert.equal(grayTop.value, 12);
+        assert.equal(grayBottom.value, 0);
+        assert.equal(whiteTop.value, 12);
+        assert.equal(whiteBottom.value, 12);
+        assert.equal(displayNumber.value, 12);
+
+
+        this.rc.add(solver);
       }.bind(this));
     });
 
