@@ -189,4 +189,3 @@ EMSCRIPTEN_BINDINGS(my_module)
     ;
 }
 
-
