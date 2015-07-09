@@ -16,16 +16,12 @@ define([], function() {
                     }
 
                     console.log("Evaluating asmjs code...");
-                    console.time("prepend code");
                     var newCode = "var memoryInitializerPath = '" + path + "';" + request.responseText;
-                    console.timeEnd("prepend code");
                     solverObj = new Function(newCode)();
 
                     if (oldWindowModule) {
-                        console.log("restoring Module");
                         window.Module = oldWindowModule;
                     } else {
-                        console.log("deleting Module");
                         delete window.Module;
                     }
                     console.log("calling callback");

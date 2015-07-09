@@ -56,11 +56,10 @@ describe('Z3', function(){
             s1.addConstraint(eq1);
             s1.addConstraint(ineq1);
 
-            var solution = s1.solve();
-            console.log("solution",  solution);
+            s1.solve();
 
-            assert.isTrue(solution[v1.name] >= solution[v2.name]);
-            assert.isTrue(solution[v1.name] - 1 === solution[v2.name]);
+            assert.isTrue(v1.value >= v2.value);
+            assert.isTrue(v1.value - 1 === v2.value);
         })
     })
 
