@@ -16,9 +16,59 @@ function perfTest(runner, runs) {
   return (performance.now() - start) / runs;
 }
 
+function ReferenceCounterRoot () {
+  var children = [];
 
-describe("Rhea", function(){
-  before(function(done){
+  this.add = function () {
+    for(var i = 0; i < arguments.length; i++) {
+      arguments[i].rc.increment();
+      children.push(arguments[i]);
+    }
+  }
+  this.deleteAll = function () {
+    children.forEach(function (child) {
+      child.delete();
+    });
+    children = [];
+  }
+}
+
+
+describe("Rhea", function () {
+  beforeEach(function (done) {
+
+    function ReferenceCounter (self) {
+      var counter = 0;
+      var children = [];
+
+      self.rc = {
+        increment: function () {
+          counter++;
+        },
+        add: function () {
+          for(var i = 0; i < arguments.length; i++) {
+            arguments[i].rc.increment();
+            children.push(arguments[i]);
+          }
+        }
+      };
+      self.delete = function () {
+        counter--;
+        if (counter == 0) {
+          if (typeof self.base != "undefined") {
+            self.base.delete();
+          }
+          children.forEach(function (child) {
+            child.delete();
+          });
+        } else if (counter < 0) {
+          throw new Error("Object already deleted");
+        }
+      };
+    }
+
+    this.rc = new ReferenceCounterRoot();
+
     loadModule("rhea.wrapped.js", "/cassowary/", function (rhea) {
       this.rhea = rhea;
       this.deleteAll = function () {
@@ -26,14 +76,198 @@ describe("Rhea", function(){
           arguments[i].delete();
         }
       }
+
+      this.r = (function (rhea) {
+
+        function isExpression(a) { return a instanceof Expression; }
+        function isVariable(a) { return a instanceof Variable; }
+        function isEquation(a) { return a instanceof Equation; }
+        function isInequality(a) { return a instanceof Inequality; }
+        function isConstraint(a) { return a instanceof Constraint; }
+        function isNumber(a) { return typeof a == "number"; }
+
+        function Variable(obj) {
+          ReferenceCounter(this);
+          var v;
+          if (obj && typeof obj.value == "number") {
+            v = new rhea.Module.Variable(obj.value);
+          } else {
+            v = new rhea.Module.Variable();
+          }
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: v });
+          Object.defineProperty(this, "value", { get: function () { return v.value(); } });
+          this.set = function (value) { v.set_value(value); };
+        }
+
+        function plus(e1, e2) { return new Expression(e1, "+", e2); }
+        function minus(e1, e2) { return new Expression(e1, "-", e2); }
+        function times(e1, e2) { return new Expression(e1, "*", e2); }
+        function divide(e1, e2) { return new Expression(e1, "/", e2); }
+
+        function Expression(v1, op, v2) {
+          
+          ReferenceCounter(this);
+          var e;
+          
+          if (isVariable(v1) && isVariable(v2)) {
+            e = rhea.Module.createExpressionVarVar(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isNumber(v2)) {
+            e = rhea.Module.createExpressionVarConst(v1.base, op, v2);
+            this.rc.add(v1);
+          } else if (isNumber(v1) && isVariable(v2)) {
+            e = rhea.Module.createExpressionConstVar(v1, op, v2.base);
+            this.rc.add(v2);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+
+          this.evaluate = function () { return e.evaluate(); };
+
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: e });
+        }
+
+        function Equation(v1, v2) {
+          ReferenceCounter(this);
+          var e;
+
+          if (isExpression(v1) && isVariable(v2)) {
+            e = rhea.Module.createEquationExpVar(v1.base, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isExpression(v2)) {
+            e = rhea.Module.createEquationVarExp(v1.base, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isVariable(v2)) {
+            e = rhea.Module.createEquationVarVar(v1.base, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isExpression(v1) && isExpression(v2)) {
+            e = rhea.Module.createEquationExpExp(v1.base, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isExpression(v1) && isNumber(v2)) {
+            e = rhea.Module.createEquationExpConst(v1.base, v2);
+            this.rc.add(v1);
+          } else if (isNumber(v1) && isExpression(v2)) {
+            e = rhea.Module.createEquationExpConst(v2.base, v1);
+            this.rc.add(v2);
+          } else if (isVariable(v1) && isNumber(v2)) {
+            e = rhea.Module.createEquationVarConst(v1.base, v2);
+            this.rc.add(v1);
+          } else if (isNumber(v1) && isVariable(v2)) {
+            e = rhea.Module.createEquationVarConst(v2.base, v1);
+            this.rc.add(v2);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+
+          this.isSatisfied = function () { return e.is_satisfied(); };
+
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: e });
+
+        }
+
+        function Inequality(v1, op, v2) {
+          ReferenceCounter(this);
+          var e;
+
+          if (isExpression(v1) && isExpression(v2)) {
+            e = rhea.Module.createInequalityExpExp(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isExpression(v2)) {
+            e = rhea.Module.createInequalityVarExp(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isExpression(v1) && isVariable(v2)) {
+            e = rhea.Module.createInequalityVarExp(v2.base, op, v1.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isVariable(v2)) {
+            e = rhea.Module.createInequalityVarVar(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isNumber(v2)) {
+            e = rhea.Module.createInequalityVarConst(v1.base, op, v2);
+            this.rc.add(v1);
+          } else if (isNumber(v1) && isVariable(v2)) {
+            e = rhea.Module.createInequalityVarConst(v1, op, v2.base);
+            this.rc.add(v2);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+
+          this.isSatisfied = function () { return e.is_satisfied(); };
+
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: e });
+        }
+
+        function Constraint(e1) {
+          ReferenceCounter(this);
+          var c;
+
+          if (isEquation(e1)) {
+            c = rhea.Module.createConstraintEq(e1.base);
+            this.rc.add(e1);
+          } else if (isInequality(e1)) {
+            c = rhea.Module.createConstraintIneq(e1.base);
+            this.rc.add(e1);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+
+          this.isSatisfied = function () { return c.is_satisfied(); };
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: c });
+
+        }
+
+        function SimplexSolver() {
+          ReferenceCounter(this);
+          var solver = new rhea.Module.SimplexSolver();
+
+          this.addConstraint = function (c) {
+            if (isConstraint(c)) {
+              solver.add_constraint(c.base);
+              this.rc.add(c);
+            } else if (isEquation(c) || isInequality(c)) {
+              this.addConstraint(new Constraint(c));
+            }
+          }
+
+          this.solve = function () {
+            solver.solve();
+          }
+
+          Object.defineProperty(this, "base", { enumerable: false, readonly: true, value: solver });
+        }
+
+        return {
+          Variable : Variable,
+          Expression: Expression,
+          Equation: Equation,
+          Inequality: Inequality,
+          SimplexSolver: SimplexSolver,
+          Constraint: Constraint,
+          GEQ: ">=",
+          LEQ: "<=",
+          plus,
+          minus,
+          times,
+          divide
+        }
+      })(rhea);
+
+
       done();
     }.bind(this));
+  });
+  afterEach(function () {
+    this.rc.deleteAll();
   });
   describe('Properties', function () {
     it('Module present in rhea', function () {
       assert.isTrue('Module' in this.rhea);
     });
   });
+
+
+
+
+
   describe("Run", function () {
     it("should run test function", function () {
       // v1 - 1 == v2, v1 >= 2
@@ -227,6 +461,213 @@ describe("Rhea", function(){
         // assert.isTrue(v1.value() >= 2);
 
         this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
+      }.bind(this));
+    });
+
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+  describe("Run - New API", function () {
+    it("should run test function", function () {
+      // v1 - 1 == v2, v1 >= 2
+      var res = this.rhea.Module.test();
+      console.log(res.get(0), res.get(1));
+      assert.isTrue(res.get(0) - 1 == res.get(1));
+      assert.isTrue(res.get(0) >= 2);
+    });
+    it("should create a Variable", function () {
+      var v1 = new this.r.Variable({ value: 12 });
+      assert.equal(v1.value, 12);
+      this.rc.add(v1);
+    });
+    it("should modify a Variable", function () {
+      var v1 = new this.r.Variable({ value: 12 });
+      v1.set(23);
+      assert.equal(v1.value, 23);
+      this.rc.add(v1);
+    });
+    it("should create expressions", function () {
+      var v1 = new this.r.Variable({ value: 1 });
+      var v2 = new this.r.Variable({ value: 2 });
+
+      var e1 = this.r.plus(v1, v2);
+      var e2 = this.r.minus(v1, v2);
+
+      var e3 = this.r.plus(v1, 3);
+      var e4 = this.r.minus(v1, 3);
+      var e5 = this.r.times(v1, 3);
+      var e6 = this.r.divide(v1, 2);
+
+      var e7 = this.r.plus(3, v2)
+      var e8 = this.r.minus(3, v2)
+      var e9 = this.r.times(3, v2)
+
+      assert.equal(e1.evaluate(), 3);
+      assert.equal(e2.evaluate(), -1);
+
+      assert.equal(e3.evaluate(), 4);
+      assert.equal(e4.evaluate(), -2);
+      assert.equal(e5.evaluate(), 3);
+      assert.equal(e6.evaluate(), 0.5);
+
+      assert.equal(e7.evaluate(), 5);
+      assert.equal(e8.evaluate(), 1);
+      assert.equal(e9.evaluate(), 6);
+
+      this.rc.add(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    });
+
+    it("should create equations", function () {
+      var v1 = new this.r.Variable({ value: 1 });
+      var v2 = new this.r.Variable({ value: 2 });
+
+      var e1 = this.r.plus(v1, v2);
+      var e2 = this.r.minus(v2, v1);
+
+      var eq1 = new this.r.Equation(e1, v2);
+      var eq2 = new this.r.Equation(v1, e2);
+      var eq3 = new this.r.Equation(v1, v2);
+      var eq4 = new this.r.Equation(e1, e2);
+      var eq5 = new this.r.Equation(v2, 2);
+
+      assert.isFalse(eq1.isSatisfied()); // v1 + v2 == v2
+      assert.isTrue(eq2.isSatisfied()); // v1 == v2 - v1
+      assert.isFalse(eq3.isSatisfied()); // v1 == v2
+      assert.isFalse(eq4.isSatisfied()); // v1 + v2 == v1 - v2
+      assert.isTrue(eq5.isSatisfied()); // v2 == 2
+
+      this.rc.add(eq1, eq2, eq3, eq4, eq5);
+    });
+
+    it("should create inequalities", function () {
+      var v1 = new this.r.Variable({ value: 1 });
+      var v2 = new this.r.Variable({ value: 2 });
+
+      var e1 = this.r.plus(v1, v2);
+      var e2 = this.r.minus(v1, v2);
+
+      var eq1 = new this.r.Inequality(e1, "<=", e2);
+      var eq2 = new this.r.Inequality(v1, ">=", e2);
+      var eq3 = new this.r.Inequality(v1, "<=", v2);
+      var eq4 = new this.r.Inequality(v1, ">=", 3);
+
+      assert.isFalse(eq1.isSatisfied()); // v1 + v2 <= v1 - v2
+      assert.isTrue(eq2.isSatisfied()); // v1 >= v1 - v2
+      assert.isTrue(eq3.isSatisfied()); // v1 <= v2
+      assert.isFalse(eq4.isSatisfied()); // v1 >= 3
+
+      this.rc.add(eq1, eq2, eq3, eq4);
+    });
+
+    it("should create constraints", function () {
+      var v1 = new this.r.Variable({ value: 1 });
+      var eq1 = new this.r.Equation(v1, 2);
+      var eq2 = new this.r.Inequality(v1, "<=", 2);
+
+      var c1 = new this.r.Constraint(eq1);
+      var c2 = new this.r.Constraint(eq2);
+
+      assert.isFalse(c1.isSatisfied());
+      assert.isTrue(c2.isSatisfied());
+
+      this.rc.add(c1, c2);
+    });
+    
+    it("should create a solver", function () {
+      var v1 = new this.r.Variable({ value: 1 });
+      var eq1 = new this.r.Equation(v1, 2);
+
+      var s1 = new this.r.SimplexSolver();
+      s1.addConstraint(eq1);
+
+      this.rc.add(s1);
+    });
+
+    it("should solve an equation", function () {
+      var v1 = new this.r.Variable({ value: 3 });
+      var v2 = new this.r.Variable({ value: 2 });
+
+      var e1 = this.r.minus(v1, 1);
+      var eq1 = new this.r.Equation(e1, v2);
+
+      var s1 = new this.r.SimplexSolver();
+      s1.addConstraint(eq1);
+      s1.solve();
+      assert.isTrue(v1.value - 1 == v2.value);
+
+      this.rc.add(s1);
+    });
+
+    it("should solve an inequality", function () {
+      var v1 = new this.r.Variable({ value: 3 });
+      var v2 = new this.r.Variable({ value: 4 });
+
+      var eq1 = new this.r.Inequality(v1, ">=", v2);
+
+      var s1 = new this.r.SimplexSolver();
+      s1.addConstraint(eq1);
+      s1.solve();
+      assert.isTrue(v1.value >= v2.value);
+
+      this.rc.add(s1);
+    });
+
+    it("should solve multiple constraints", function () {
+      var v1 = new this.r.Variable();
+      var v2 = new this.r.Variable();
+      
+      // v1 - 1 == v2
+      var e1 = this.r.minus(v1, 1);
+      var eq1 = new this.r.Equation(e1, v2);
+      
+      // v1 >= 2
+      var eq2 = new this.r.Inequality(v1, ">=", 2);
+
+      var s1 = new this.r.SimplexSolver();
+      s1.addConstraint(eq1);
+      s1.addConstraint(eq2);
+      s1.solve();
+
+      console.log(v1.value, v2.value);
+      assert.isTrue(v1.value - 1 == v2.value);
+      assert.isTrue(v1.value >= 2);
+
+      this.rc.add(s1);
+    });
+
+    it("should benchmark solving multiple constraints", function () {
+      this._runnable.title += ": " + perfTest(function () {
+      var v1 = new this.r.Variable();
+      var v2 = new this.r.Variable();
+      
+      // v1 - 1 == v2
+      var e1 = this.r.minus(v1, 1);
+      var eq1 = new this.r.Equation(e1, v2);
+      
+      // v1 >= 2
+      var eq2 = new this.r.Inequality(v1, ">=", 2);
+
+      var s1 = new this.r.SimplexSolver();
+      s1.addConstraint(eq1);
+      s1.addConstraint(eq2);
+      s1.solve();
+
+      console.log(v1.value, v2.value);
+      assert.isTrue(v1.value - 1 == v2.value);
+      assert.isTrue(v1.value >= 2);
+
+      this.rc.add(s1);
       }.bind(this));
     });
 
