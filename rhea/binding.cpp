@@ -7,6 +7,10 @@
 
 using namespace emscripten;
 
+rhea::linear_expression createExpressionConst(double v1) {
+  return rhea::linear_expression(v1);
+}
+
 rhea::linear_expression createExpressionVarVar(rhea::variable &v1, std::string op, rhea::variable &v2) {
   if (op == "+") {
     return rhea::linear_expression(v1 + v2);
@@ -86,8 +90,14 @@ bool inequalityIsSatisfied(rhea::linear_inequality &c) {
 void solverAddConstraint(rhea::simplex_solver &s, rhea::constraint &c) {
   s.add_constraint(c);
 }
+void solverRemoveConstraint(rhea::simplex_solver &s, rhea::constraint &c) {
+  s.remove_constraint(c);
+}
 void solverAddStay(rhea::simplex_solver &s, rhea::variable &v) {
   s.add_stay(v);
+}
+void solverRemoveStay(rhea::simplex_solver &s, rhea::variable &v) {
+  s.remove_stay(v);
 }
 void solverAddEditVar(rhea::simplex_solver &s, rhea::variable &v) {
   s.add_edit_var(v);
@@ -107,12 +117,12 @@ void solverSolve(rhea::simplex_solver &s) {
 std::vector<double> test() {
   rhea::variable v1, v2;
   rhea::simplex_solver solver;
-  
+
   // v1 - 1 == v2
   rhea::linear_expression e1 = createExpressionVarConst(v1, "-", 1);
   rhea::linear_equation eq1 = createEquationExpVar(e1, v2);
   rhea::constraint c1 = createConstraintEq(eq1);
-  
+
   // v1 >= 2
   rhea::linear_inequality eq2 = createInequalityVarConst(v1, ">=", 2);
   rhea::constraint c2 = createConstraintIneq(eq2);
@@ -136,6 +146,7 @@ EMSCRIPTEN_BINDINGS(my_module)
   register_vector<double>("VectorDouble");
   function("test", &test);
 
+  function("createExpressionConst", &createExpressionConst);
   function("createExpressionVarVar", &createExpressionVarVar);
   function("createExpressionVarConst", &createExpressionVarConst);
   function("createExpressionConstVar", &createExpressionConstVar);
@@ -186,6 +197,9 @@ EMSCRIPTEN_BINDINGS(my_module)
     .function("solve", &solverSolve)
     .function("begin_edit", &rhea::simplex_solver::begin_edit)
     .function("end_edit", &rhea::simplex_solver::end_edit)
+    .function("remove_all_edit_vars", &rhea::simplex_solver::remove_all_edit_vars)
+    .function("remove_constraint", &solverRemoveConstraint)
+    .function("remove_stay", &solverRemoveStay)
     ;
 }
 
