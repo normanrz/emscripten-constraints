@@ -79,11 +79,13 @@ define(["../loader"], function(loadModule) {
       function divide(e1, e2) { return new Expression(e1, "/", e2); }
 
       function Expression(v1, op, v2) {
-        
+
         ReferenceCounter(this);
         var e;
-        
-        if (isVariable(v1) && isVariable(v2)) {
+
+        if (arguments.length == 1 && isNumber(v1)) {
+          e = rhea.Module.createExpressionConst(v1);
+        } else if (isVariable(v1) && isVariable(v2)) {
           e = rhea.Module.createExpressionVarVar(v1.base, op, v2.base);
           this.rc.add(v1, v2);
         } else if (isVariable(v1) && isNumber(v2)) {
@@ -118,11 +120,13 @@ define(["../loader"], function(loadModule) {
           e = rhea.Module.createEquationExpExp(v1.base, v2.base);
           this.rc.add(v1, v2);
         } else if (isExpression(v1) && isNumber(v2)) {
-          e = rhea.Module.createEquationExpConst(v1.base, v2);
-          this.rc.add(v1);
+          var e2 = new Expression(v2);
+          e = rhea.Module.createEquationExpExp(v1.base, e2.base);
+          this.rc.add(v1, e2);
         } else if (isNumber(v1) && isExpression(v2)) {
-          e = rhea.Module.createEquationExpConst(v2.base, v1);
-          this.rc.add(v2);
+          var e1 = new Expression(v1);
+          e = rhea.Module.createEquationExpExp(v2.base, e1.base);
+          this.rc.add(v2, e1);
         } else if (isVariable(v1) && isNumber(v2)) {
           e = rhea.Module.createEquationVarConst(v1.base, v2);
           this.rc.add(v1);
@@ -161,6 +165,14 @@ define(["../loader"], function(loadModule) {
         } else if (isNumber(v1) && isVariable(v2)) {
           e = rhea.Module.createInequalityVarConst(v1, op, v2.base);
           this.rc.add(v2);
+        } else if (isExpression(v1) && isNumber(v2)) {
+          var e2 = new Expression(v2);
+          e = rhea.Module.createInequalityExpExp(v1.base, op, e2.base);
+          this.rc.add(v1, e2);
+        } else if (isNumber(v1) && isExpression(v2)) {
+          var e1 = new Expression(v1);
+          e = rhea.Module.createInequalityExpExp(v1.base, op, v2.base);
+          this.rc.add(e1, v2);
         } else {
           throw new TypeError("Invalid arguments");
         }
@@ -226,9 +238,28 @@ define(["../loader"], function(loadModule) {
           }
         };
 
+        this.removeConstraint = function (c) {
+          if (isConstraint(c)) {
+            solver.remove_constraint(c);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+        };
+
+        this.removeStay = function (c) {
+          if (isVariable(c)) {
+            solver.remove_stay(c);
+          } else {
+            throw new TypeError("Invalid arguments");
+          }
+        };
+
+        this.removeAllEditVars = function () { solver.remove_all_edit_vars(); };
+
         this.solve = function () { solver.solve(); };
         this.beginEdit = function () { solver.begin_edit(); };
         this.endEdit = function () { solver.end_edit(); };
+
 
         this.suggest = function (v, value) {
           if (isVariable(v)) {

@@ -50,9 +50,11 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           var e5 = rhea._Module.createExpressionVarConst(v1, "*", 3);
           var e6 = rhea._Module.createExpressionVarConst(v1, "/", 2);
 
-          var e7 = rhea._Module.createExpressionConstVar(3, "+", v2)
-          var e8 = rhea._Module.createExpressionConstVar(3, "-", v2)
-          var e9 = rhea._Module.createExpressionConstVar(3, "*", v2)
+          var e7 = rhea._Module.createExpressionConstVar(3, "+", v2);
+          var e8 = rhea._Module.createExpressionConstVar(3, "-", v2);
+          var e9 = rhea._Module.createExpressionConstVar(3, "*", v2);
+
+          var e0 = rhea._Module.createExpressionConst(3);
 
           assert.equal(e1.evaluate(), 3);
           assert.equal(e2.evaluate(), -1);
@@ -66,7 +68,9 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           assert.equal(e8.evaluate(), 1);
           assert.equal(e9.evaluate(), 6);
 
-          this.deleteAll(v1, v2, e1, e2, e3, e4, e5, e6, e7, e8, e9);
+          assert.equal(e0.evaluate(), 3);
+
+          this.deleteAll(v1, v2, e1, e2, e3, e4, e5, e6, e7, e8, e9, e0);
         });
 
         it("should create equations", function () {
@@ -183,7 +187,7 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           s1.solve();
 
           console.log(v1.value(), v2.value());
-          assert.isTrue(v1.value() - 1 == v2.value())
+          assert.isTrue(v1.value() - 1 == v2.value());
           assert.isTrue(v1.value() >= 2);
 
           this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
@@ -248,9 +252,11 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           var e5 = rhea.times(v1, 3);
           var e6 = rhea.divide(v1, 2);
 
-          var e7 = rhea.plus(3, v2)
-          var e8 = rhea.minus(3, v2)
-          var e9 = rhea.times(3, v2)
+          var e7 = rhea.plus(3, v2);
+          var e8 = rhea.minus(3, v2);
+          var e9 = rhea.times(3, v2);
+
+          var e0 = new rhea.Expression(3);
 
           assert.equal(e1.evaluate(), 3);
           assert.equal(e2.evaluate(), -1);
@@ -264,7 +270,9 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           assert.equal(e8.evaluate(), 1);
           assert.equal(e9.evaluate(), 6);
 
-          this.rc.add(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+          assert.equal(e0.evaluate(), 3);
+
+          this.rc.add(e1, e2, e3, e4, e5, e6, e7, e8, e9, e0);
         });
 
         it("should create equations", function () {
@@ -279,14 +287,16 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           var eq3 = new rhea.Equation(v1, v2);
           var eq4 = new rhea.Equation(e1, e2);
           var eq5 = new rhea.Equation(v2, 2);
+          var eq6 = new rhea.Equation(e1, 3);
 
           assert.isFalse(eq1.isSatisfied()); // v1 + v2 == v2
           assert.isTrue(eq2.isSatisfied()); // v1 == v2 - v1
           assert.isFalse(eq3.isSatisfied()); // v1 == v2
           assert.isFalse(eq4.isSatisfied()); // v1 + v2 == v1 - v2
           assert.isTrue(eq5.isSatisfied()); // v2 == 2
+          assert.isTrue(eq6.isSatisfied()); // v1 + v2 == 3
 
-          this.rc.add(eq1, eq2, eq3, eq4, eq5);
+          this.rc.add(eq1, eq2, eq3, eq4, eq5, eq6);
         });
 
         it("should create inequalities", function () {
@@ -300,13 +310,15 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           var eq2 = new rhea.Inequality(v1, ">=", e2);
           var eq3 = new rhea.Inequality(v1, "<=", v2);
           var eq4 = new rhea.Inequality(v1, ">=", 3);
+          var eq5 = new rhea.Inequality(e1, ">=", 4);
 
           assert.isFalse(eq1.isSatisfied()); // v1 + v2 <= v1 - v2
           assert.isTrue(eq2.isSatisfied()); // v1 >= v1 - v2
           assert.isTrue(eq3.isSatisfied()); // v1 <= v2
           assert.isFalse(eq4.isSatisfied()); // v1 >= 3
+          assert.isFalse(eq5.isSatisfied()); // v1 + v2 >= 4
 
-          this.rc.add(eq1, eq2, eq3, eq4);
+          this.rc.add(eq1, eq2, eq3, eq4, eq5);
         });
 
         it("should create constraints", function () {
