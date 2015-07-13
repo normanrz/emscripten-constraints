@@ -34,7 +34,6 @@ define(["../loader"], function(loadModule) {
         var variableCounter = 0;
         var variableMap = {};
         z3.c = {
-          mine : true,
           Variable : function(opts) {
             this.value = (opts || {}).value;
             this.name = "var" + variableCounter++;

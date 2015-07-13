@@ -72,7 +72,7 @@ describe('Z3', function(){
             // solver.addEditVar(mouseLocationY);
             constraints.forEach(function(constraint) {
               solver.addConstraint(constraint);
-            })
+            });
             solver.solve();
 
             assert.equal(temperature.value, mercuryTop.value);
