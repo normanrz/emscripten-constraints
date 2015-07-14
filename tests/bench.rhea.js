@@ -130,9 +130,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             assert.equal(v2.value, 4);
             assert.equal(v3.value, 5);
             assert.equal((v1.value * v1.value) + (v2.value * v2.value), v3.value * v3.value);
-
-            this.rc.add(s1);
-          });
         });
 
         it("Add 50 Equations", function () {
@@ -144,9 +141,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
               s1.addConstraint(new c.Equation(c1, c.plus(c2, 1)));
               c1 = c2;
             }
-
-            this.rc.add(s1);
-          });
         });
 
         it("Add 50 Inequalities", function () {
@@ -158,8 +152,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
               s1.addConstraint(new c.Inequality(c1, c.GEQ, c.plus(c2, 1)));
               c1 = c2;
             }
-
-            this.rc.add(s1);
           });
         });
 
@@ -178,8 +170,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             for (var i = 0; i < equations.length; i++) {
               s1.removeConstraint(equations[i]);
             }
-
-            this.rc.add(s1);
           });
         });
 
@@ -198,8 +188,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             for (var i = 0; i < equations.length; i++) {
               s1.removeConstraint(equations[i]);
             }
-
-            this.rc.add(s1);
           });
         });
 
@@ -234,8 +222,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             assert.isTrue(v2.value <= v1.value * 500.4);
             assert.isTrue(v5.value >= v4.value + 250.2);
             assert.isTrue(v3.value >= v3.value - 100);
-
-            this.rc.add(s1);
           });
         });
 
