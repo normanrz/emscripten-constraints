@@ -38,6 +38,21 @@ describe('Z3', function(){
             assert.isTrue(solution.indexOf("top1 500.0") > -1);
         });
 
+        it("should support rational numbers", function() {
+          var z3 = this.z3;
+          var c = z3.c;
+
+          var tenOverTwelve = c.divide(10, 12);
+          var result = new c.Variable();
+
+          var solver = new c.SimplexSolver();
+          solver.addConstraint(new c.Equation(result, tenOverTwelve));
+
+          solver.solve();
+          var absDiff = Math.abs(result.value - 10/12);
+          assert.isTrue(absDiff < 0.1);
+        });
+
         it("should solve a complex constraint set", function () {
           var z3 = this.z3;
           var c = z3.c;

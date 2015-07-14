@@ -90,15 +90,25 @@ define(["../loader"], function(loadModule) {
             this.solve = function() {
               var problemString = this.getProblemString();
               var solutionString = z3.solveProblem(problemString);
-
-              // remove all brackets
-              solutionString = solutionString.replace(/[()]/g, "");
-              var regex = /(var[0-9]+) ((- )?[0-9](\.[0-9]+)?)/g;
+              var varTermRegex = /\((var[0-9]+) (.*?)\)/g;
 
               var result;
-              while (result = regex.exec(solutionString)) {
+              while (result = varTermRegex.exec(solutionString)) {
                 var varName = result[1];
-                var value = parseFloat(result[2].replace(/\s/g, ""));
+                var term = result[2].replace(/[()]/g, "");
+
+                var rationalRegex = /\/ ([0-9](\.[0-9]+)?) ([0-9](\.[0-9]+)?)/;
+                var rationalResult;
+                var value;
+                if (rationalResult = rationalRegex.exec(term)) {
+                  var sign = term.indexOf("-") > -1 ? -1 : 1;
+                  var a = parseFloat(rationalResult[1]);
+                  var b = parseFloat(rationalResult[3]);
+                  value = sign * a / b;
+                } else {
+                  value = parseFloat(term.replace(/\s/g, ""));
+                }
+
                 variableMap[varName].value = value;
               }
             }
