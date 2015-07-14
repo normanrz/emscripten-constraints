@@ -1,6 +1,17 @@
 #!/bin/bash
 echo "Concatenating files..."
-cp $1 $2
+# $1 = original solver file
+# $2 = output file
+# $3 = [common|amd]
+
+if [ -e $1.pre ]; then
+  # if $1.pre exists, we preprend it to $1 and save it to $2
+  cp $1.pre $2
+  cat $1 >> $2
+else
+  cp $1 $2
+fi
+
 if [[ $3 = "common" ]]; then
   echo "exports.Module = Module; exports.FS = FS; " >> $2
 elif [[ $3 = "amd" ]]; then
