@@ -97,7 +97,7 @@ define(["../loader"], function(loadModule) {
                 var varName = result[1];
                 var term = result[2].replace(/[()]/g, "");
 
-                var rationalRegex = /\/ ([0-9](\.[0-9]+)?) ([0-9](\.[0-9]+)?)/;
+                var rationalRegex = /\/ ([0-9]+(\.[0-9]+)?) ([0-9]+(\.[0-9]+)?)/;
                 var rationalResult;
                 var value;
                 if (rationalResult = rationalRegex.exec(term)) {
