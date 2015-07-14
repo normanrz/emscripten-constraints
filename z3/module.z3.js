@@ -36,13 +36,13 @@ define(["../loader"], function(loadModule) {
         z3.c = {
           Variable : function(opts) {
             this.value = (opts || {}).value;
-            this.name = "var" + variableCounter++;
+            this._name = "var" + variableCounter++;
             var _this = this;
             this.toString = function() {
               // return this.value || _this.name;
-              return _this.name;
+              return _this._name;
             };
-            variableMap[this.name] = this;
+            variableMap[this._name] = this;
           },
           Inequality : function(exp1, comparator, exp2) {
             this.exp1 = exp1;
@@ -134,6 +134,22 @@ define(["../loader"], function(loadModule) {
 
               return [varDeclarationString, constraintString, getValueString].join("\n");
             };
+            this.removeConstraint = function (c) {
+              this.constraints.splice(this.constraints.indexOf(c), 1);
+            };
+            this.suggest = this.suggestValue = function (v, value) {
+              var constraint = new z3.c.Equation(v, value);
+              this.addConstraint(constraint);
+              this.solve();
+              this.removeConstraint(constraint);
+            };
+
+            this.addEditVar = function () {};
+            this.addStay = function () {};
+            this.removeStay = function () {};
+            this.removeAllEditVars = function () {};
+            this.beginEdit = function () {};
+            this.endEdit = function () {};
           }
         };
 
