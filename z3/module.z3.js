@@ -13,7 +13,7 @@ define(["../loader"], function(loadModule) {
           var stdout = [];
           window.console.log = function(solution) {
             stdout.push(solution);
-            oldConsoleLog.apply(console, arguments);
+            // oldConsoleLog.apply(console, arguments);
           }
 
           z3.FS.createDataFile("/", fileName, "(check-sat) " + problem, !0, !0);
