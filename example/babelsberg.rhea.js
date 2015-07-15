@@ -24,6 +24,7 @@ module("users.timfelgentreff.rhea").requires().toRun(function() {
             if ("number" == typeof value || null === value || value instanceof Number) {
                 var v = new rhea.Variable({ value: value + 0 });
                 v.setSolver(this.solver);
+                this.solver.addStay(v);
                 v.name = ivarname + "" + this.variables.length;
                 return v
             }
@@ -96,7 +97,7 @@ module("users.timfelgentreff.rhea").requires().toRun(function() {
 
         extend(binding.Variable.prototype, {
             stay: function() {
-                this.solver.addStay(this);
+                // this.solver.addStay(this);
             },
             removeStay: function() {
                 throw new Error("Not implemented: Variable.removeStay");
@@ -105,18 +106,17 @@ module("users.timfelgentreff.rhea").requires().toRun(function() {
                 if (value !== this.value) {
                     this.solver.addEditVar(this);
                     this.solver.beginEdit();
-                    this.solver.addStay(this);
                     this.solver.suggestValue(this, value);
                     this.solver.endEdit();
                     this.solver.removeAllEditVars();
                 }
             },
             prepareEdit: function() {
-                solver.addEditVar(this);
-                solver.beginEdit();
+                // solver.addEditVar(this);
+                // solver.beginEdit();
             },
             finishEdit: function() {
-                solver.endEdit();
+                // solver.endEdit();
             },
             setReadonly: function (bool) {
 

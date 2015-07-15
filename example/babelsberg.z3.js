@@ -105,7 +105,6 @@ module("users.timfelgentreff.z3").requires().toRun(function() {
                 if (value !== this.value) {
                     this.solver.addEditVar(this);
                     this.solver.beginEdit();
-                    this.solver.addStay(this);
                     this.solver.suggestValue(this, value);
                     this.solver.endEdit();
                     this.solver.removeAllEditVars();

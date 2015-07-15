@@ -50,6 +50,8 @@ define(["../loader"], function(loadModule) {
             throw new Error("Object already deleted");
           }
         };
+
+        console.log("New object", self.constructor.name);
       }
 
 

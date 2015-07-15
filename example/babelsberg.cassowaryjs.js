@@ -13,6 +13,7 @@ module("users.timfelgentreff.cassowaryjs").requires().toRun(function() {
             this.loadModule(url);
             this.solver = new cassowary.SimplexSolver();
             this.variables = [];
+            this.constraints = [];
         },
         always: function(opts, func) {
             if (opts.priority) throw new Error("Not implemented: CustomSolver.always - Priority");
@@ -26,6 +27,7 @@ module("users.timfelgentreff.cassowaryjs").requires().toRun(function() {
                 var v = new cassowary.Variable({ value: value + 0 });
                 v.setSolver(this.solver);
                 v.name = ivarname + "" + this.variables.length;
+                this.solver.addStay(v);
                 return v
             }
             return null
@@ -50,6 +52,7 @@ module("users.timfelgentreff.cassowaryjs").requires().toRun(function() {
             this.variables.push(v);
         },
         addConstraint: function(c) {
+            this.constraints.push(c);
             this.solver.addConstraint(c);
         },
         removeConstraint: function(c) {
@@ -97,7 +100,7 @@ module("users.timfelgentreff.cassowaryjs").requires().toRun(function() {
 
         extend(binding.Variable.prototype, {
             stay: function() {
-                this.solver.addStay(this);
+                // this.solver.addStay(this);
             },
             removeStay: function() {
                 throw new Error("Not implemented: Variable.removeStay");
@@ -106,18 +109,17 @@ module("users.timfelgentreff.cassowaryjs").requires().toRun(function() {
                 if (value !== this.value) {
                     this.solver.addEditVar(this);
                     this.solver.beginEdit();
-                    this.solver.addStay(this);
                     this.solver.suggestValue(this, value);
                     this.solver.endEdit();
                     this.solver.removeAllEditVars();
                 }
             },
             prepareEdit: function() {
-                solver.addEditVar(this);
-                solver.beginEdit();
+                // solver.addEditVar(this);
+                // solver.beginEdit();
             },
             finishEdit: function() {
-                solver.endEdit();
+                // solver.endEdit();
             },
             setReadonly: function (bool) {
 

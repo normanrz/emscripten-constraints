@@ -96,9 +96,6 @@ void solverRemoveConstraint(rhea::simplex_solver &s, rhea::constraint &c) {
 void solverAddStay(rhea::simplex_solver &s, rhea::variable &v) {
   s.add_stay(v);
 }
-void solverRemoveStay(rhea::simplex_solver &s, rhea::variable &v) {
-  s.remove_stay(v);
-}
 void solverAddEditVar(rhea::simplex_solver &s, rhea::variable &v) {
   s.add_edit_var(v);
 }
@@ -199,7 +196,6 @@ EMSCRIPTEN_BINDINGS(my_module)
     .function("end_edit", &rhea::simplex_solver::end_edit)
     .function("remove_all_edit_vars", &rhea::simplex_solver::remove_all_edit_vars)
     .function("remove_constraint", &solverRemoveConstraint)
-    .function("remove_stay", &solverRemoveStay)
     ;
 }
 
