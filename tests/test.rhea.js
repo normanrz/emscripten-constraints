@@ -20,7 +20,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
         it("should run test function", function () {
           // v1 - 1 == v2, v1 >= 2
           var res = rhea._Module.test();
-          console.log(res.get(0), res.get(1));
           assert.isTrue(res.get(0) - 1 == res.get(1));
           assert.isTrue(res.get(0) >= 2);
         });
@@ -186,7 +185,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           s1.add_constraint(c2);
           s1.solve();
 
-          console.log(v1.value(), v2.value());
           assert.isTrue(v1.value() - 1 == v2.value());
           assert.isTrue(v1.value() >= 2);
 
@@ -220,9 +218,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
         });
 
       });
-
-
-
 
 
       describe("Run - New API", function () {
@@ -390,101 +385,10 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           s1.addConstraint(eq2);
           s1.solve();
 
-          console.log(v1.value, v2.value);
           assert.isTrue(v1.value - 1 == v2.value);
           assert.isTrue(v1.value >= 2);
 
           this.rc.add(s1);
-        });
-
-        it("should benchmark solving multiple constraints", function () {
-          this._runnable.title += ": " + perfTest(function () {
-            var v1 = new rhea.Variable();
-            var v2 = new rhea.Variable();
-
-            // v1 - 1 == v2
-            var e1 = rhea.minus(v1, 1);
-            var eq1 = new rhea.Equation(e1, v2);
-
-            // v1 >= 2
-            var eq2 = new rhea.Inequality(v1, ">=", 2);
-
-            var s1 = new rhea.SimplexSolver();
-            s1.addConstraint(eq1);
-            s1.addConstraint(eq2);
-            s1.solve();
-
-            console.log(v1.value, v2.value);
-            assert.isTrue(v1.value - 1 == v2.value);
-            assert.isTrue(v1.value >= 2);
-
-            this.rc.add(s1);
-          }.bind(this));
-        });
-
-        it("should solve a complex constraint set", function () {
-          this._runnable.title += ": " + perfTest(function () {
-
-            var mouseLocationY = new rhea.Variable({ value: 10 });
-            var temperature = new rhea.Variable({ value: 0 });
-            var mercuryTop = new rhea.Variable({ value: 0 });
-            var mercuryBottom = new rhea.Variable({ value: 0 });
-            var thermometerTop = new rhea.Variable({ value: 0 });
-            var thermometerBottom = new rhea.Variable({ value: 0 });
-            var grayTop = new rhea.Variable({ value: 0 });
-            var grayBottom = new rhea.Variable({ value: 0 });
-            var whiteTop = new rhea.Variable({ value: 0 });
-            var whiteBottom = new rhea.Variable({ value: 0 });
-            var displayNumber = new rhea.Variable({ value: 0 });
-
-            var constraints = [
-              new rhea.Equation(temperature, mercuryTop),
-              new rhea.Equation(whiteTop, thermometerTop),
-              new rhea.Equation(whiteBottom, mercuryTop),
-              new rhea.Equation(grayTop, mercuryTop),
-              new rhea.Equation(grayBottom, mercuryBottom),
-              new rhea.Equation(displayNumber, temperature),
-              new rhea.Equation(mercuryTop, mouseLocationY),
-              new rhea.Inequality(mercuryTop, rhea.LEQ, thermometerTop),
-              new rhea.Equation(mercuryBottom, thermometerBottom)
-            ];
-
-            var solver = new rhea.SimplexSolver();
-            solver.addStay(mouseLocationY);
-            solver.addEditVar(mouseLocationY);
-            solver.addConstraints(constraints);
-            solver.solve();
-
-            assert.equal(mouseLocationY.value, 10);
-            assert.equal(temperature.value, 10);
-            assert.equal(mercuryTop.value, 10);
-            assert.equal(mercuryBottom.value, 0);
-            assert.equal(thermometerTop.value, 10);
-            assert.equal(thermometerBottom.value, 0);
-            assert.equal(grayTop.value, 10);
-            assert.equal(grayBottom.value, 0);
-            assert.equal(whiteTop.value, 10);
-            assert.equal(whiteBottom.value, 10);
-            assert.equal(displayNumber.value, 10);
-
-            solver.beginEdit();
-            solver.suggestValue(mouseLocationY, 12);
-            solver.endEdit();
-
-            assert.equal(mouseLocationY.value, 12);
-            assert.equal(temperature.value, 12);
-            assert.equal(mercuryTop.value, 12);
-            assert.equal(mercuryBottom.value, 0);
-            assert.equal(thermometerTop.value, 12);
-            assert.equal(thermometerBottom.value, 0);
-            assert.equal(grayTop.value, 12);
-            assert.equal(grayBottom.value, 0);
-            assert.equal(whiteTop.value, 12);
-            assert.equal(whiteBottom.value, 12);
-            assert.equal(displayNumber.value, 12);
-
-            this.rc.add(solver);
-          }.bind(this));
         });
       });
     });
