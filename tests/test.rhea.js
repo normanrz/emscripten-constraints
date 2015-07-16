@@ -1,4 +1,4 @@
-if (global) {
+if (typeof global !== "undefined") {
   nodeRequire = require;
   require = function a(deps, cb) {
     cb.apply(null, deps.map(nodeRequire));
@@ -6,7 +6,7 @@ if (global) {
 }
 
 require(['../rhea/module.rhea'], function (loadRhea) {
-  loadRhea(function(rhea) {
+  loadRhea().then(function(rhea) {
     describe("Rhea", function() {
 
       beforeEach(function () {
