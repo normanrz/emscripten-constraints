@@ -1,4 +1,15 @@
-define(["../loader"], function(loadModule) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(["../loader"], factory);
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory(require("../loader"));
+  } else {
+    // Browser globals (root is window)
+    root.z3 = factory(root.loadModule);
+  }
+}(this, function (loadModule) {
   return function loadZ3(cb) {
     loadModule("z3.wrapped.js", "/z3/", function(z3) {
       var memFileTimeOut = 1000;
@@ -152,9 +163,8 @@ define(["../loader"], function(loadModule) {
             this.endEdit = function () {};
           }
         };
-
         cb(z3);
       }, memFileTimeOut);
     });
   };
-});
+}));

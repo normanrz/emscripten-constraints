@@ -1,0 +1,3 @@
+var Module = {
+  TOTAL_MEMORY : 128 * 1024 * 1024
+};

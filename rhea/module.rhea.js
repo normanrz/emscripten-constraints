@@ -1,4 +1,15 @@
-define(["../loader"], function(loadModule) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(["../loader"], factory);
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory(require("../loader"));
+  } else {
+    // Browser globals (root is window)
+    root.z3 = factory(root.loadModule);
+  }
+}(this, function (loadModule) {
   return function loadRhea(cb) {
     loadModule("rhea.wrapped.js", "/rhea/", function (rhea) {
 
@@ -303,4 +314,4 @@ define(["../loader"], function(loadModule) {
 
     });
   };
-});
+}));

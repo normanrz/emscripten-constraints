@@ -1,4 +1,15 @@
-define([], function() {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define([], factory);
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory();
+  } else {
+    // Browser globals (root is window)
+    root.loader = factory();
+  }
+}(this, function () {
   return function loadModule(moduleUrl, path, callback) {
     var solverObj = null;
 
@@ -24,7 +35,6 @@ define([], function() {
           } else {
             delete window.Module;
           }
-          console.log("calling callback");
           callback(solverObj);
         } else {
           console.error("Error while loading ", moduleUrl);
@@ -34,4 +44,4 @@ define([], function() {
     request.open("GET", path + moduleUrl);
     request.send();
   };
-})
+}));
