@@ -1,3 +1,10 @@
+if (global) {
+  nodeRequire = require;
+  require = function a(deps, cb) {
+    cb.apply(null, deps.map(nodeRequire));
+  }
+}
+
 require(['../rhea/module.rhea'], function (loadRhea) {
   loadRhea(function(rhea) {
     describe("Rhea", function() {
