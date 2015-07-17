@@ -10,7 +10,7 @@ before_script:
 # - './generateWrappedZ3.sh'
 
 script:
-- 'npm test-ci'
+- 'npm test'
 
 notifications:
   slack: hpi:AoZKX6B1m6JVBphnsGGOgweU
