@@ -4,23 +4,12 @@ We use the [rhea implementation](https://github.com/Nocte-/rhea) of the cassowar
 ## Dependencies
 * Only Emscripten
 
-## Build library
+## Build
 ```
-git clone git@github.com:Nocte-/rhea.git
+git submodule init && git submodule update
 cd rhea
 emcmake cmake .
 emmake make
-```
-
-## Compile binding
-* Copy `binding.cpp` to `rhea` directory
-
-```
-emcc -c -std=c++11 -I. binding.cpp -o binding.bc
-emcc --bind rhea/librhea.so binding.bc -o rhea.js
-```
-
-## Generate Wrapper
-```
-./generateWrapper.sh rhea.js rhea.wrapped.js
+cd ..
+./build.sh
 ```

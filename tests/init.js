@@ -6,12 +6,16 @@ catch(err) {
 }
 
 function perfTest(runner, runs) {
-  if (typeof runs == "undefined") {
-    runs = 100;
-  }
-  var start = performance.now();
-  for(var i = 0; i < runs; i++) {
-    runner();
-  }
-  return (performance.now() - start) / runs;
+  return function () {
+    if (typeof runs == "undefined") {
+      runs = 100;
+    }
+    var start = performance.now();
+    for(var i = 0; i < runs; i++) {
+      runner.call(this);
+    }
+    var time = (performance.now() - start) / runs;
+    this._runnable.title += ": " + time.toFixed(3) + "ms";
+    return time;
+  };
 }

@@ -11,13 +11,16 @@
   <script src="libs/jquery.js"></script>
   <script src="libs/mocha.js"></script>
   <script src="../node_modules/cassowary/bin/c.js"></script>
-  <script>mocha.setup('bdd')</script>
+  <script>
+    mocha.setup('bdd');
+    mocha.timeout(120000);
+  </script>
   <script src="init.js"></script>
   <script src="bench.cassowary.js"></script>
   <script src="bench.rhea.js"></script>
   <script src="bench.z3.js"></script>
   <script>
-    mocha.timeout(120000);
+
     mocha.checkLeaks();
     mocha.globals(['jQuery']);
     mocha.run();
