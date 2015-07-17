@@ -9,8 +9,9 @@ before_script:
 # - 'chmod +x generateWrappedZ3.sh'
 # - './generateWrappedZ3.sh'
 
-script:
-- 'npm test'
+script: 'npm test'
+
+after_success: 'npm run benchmark'
 
 notifications:
   slack: hpi:AoZKX6B1m6JVBphnsGGOgweU

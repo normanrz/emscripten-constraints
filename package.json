@@ -29,6 +29,6 @@
     "test": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "test-watch": "./node_modules/karma/bin/karma start karma.conf.js",
     "test-mocha": "mocha tests/test.*.js",
-    "benchmark": "./node_modules/karma/bin/karma start karma_bench.conf.js "
+    "benchmark": "./node_modules/karma/bin/karma start karma_bench.conf.js --single-run"
   }
 }

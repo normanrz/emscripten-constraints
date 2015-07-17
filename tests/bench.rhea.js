@@ -1,4 +1,4 @@
-require(['../rhea/module.rhea'], function (loadRhea) {
+require(['/base/rhea/module.rhea.js'], function (loadRhea) {
   loadRhea().then(function(rhea) {
     describe("Rhea Benchmarks", function() {
 
