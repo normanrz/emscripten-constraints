@@ -3,7 +3,7 @@ describe('Z3', function(){
   before(function(done){
     var self = this;
     console.time("load z3");
-    require(['../z3/module.z3'], function (loadZ3) {
+    require(['/base/z3/module.z3.js'], function (loadZ3) {
       loadZ3().then(function(z3) {
         console.timeEnd("successfully loaded z3");
         self.z3 = z3;

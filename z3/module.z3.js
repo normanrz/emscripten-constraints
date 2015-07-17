@@ -1,10 +1,10 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD
-    define(["../loader"], factory);
+    define(["/base/loader.js"], factory);
   } else if (typeof exports === 'object') {
     // Node, CommonJS-like
-    module.exports = factory(require("../loader"));
+    module.exports = factory(require("/base/loader.js"));
   } else {
     // Browser globals (root is window)
     root.z3 = factory(root.loadModule);
@@ -12,7 +12,7 @@
 }(this, function (loadModule) {
   return function loadZ3() {
     return new Promise(function(resolve, reject) {
-      loadModule("z3.wrapped.js", "/z3/").then(function(z3) {
+      loadModule("z3.wrapped.js", "/base/z3/").then(function(z3) {
         var memFileTimeOut = 1000;
         setTimeout(function() {
 
