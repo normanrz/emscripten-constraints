@@ -21,10 +21,10 @@ function perfTest(runner, runs) {
 }
 
 
-var tests = [];
+var benchmarks = [];
 for (var file in window.__karma__.files) {
     if (/\/base\/tests\/bench\.(.)*\.js$/.test(file)) {
-        tests.push(file);
+        benchmarks.push(file);
     }
 }
 
@@ -32,8 +32,14 @@ requirejs.config({
     // Karma serves files from '/base'
     baseUrl: '/base',
 
-    // ask Require.js to load these files (all our tests)
-    deps: tests,
+    paths: {
+        'module.rhea': '/base/rhea/module.rhea',
+        'module.z3': '/base/z3/module.z3',
+        'loader': '/base/loader',
+    },
+
+    // ask Require.js to load these files (all our benchmarks)
+    deps: benchmarks,
 
     // start test run, once Require.js is done
     callback: window.__karma__.start
