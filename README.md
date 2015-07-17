@@ -1,5 +1,5 @@
 # Emscripten-based constraint solvers (API Design and toolchain)
-[![Build Status](https://magnum.travis-ci.com/normanrz/emscripten-constraints.svg?token=7fqzGEv22MQpvpU7RhK5)](https://magnum.travis-ci.com/normanrz/emscripten-constraints)
+[![Build Status](https://travis-ci.org/normanrz/emscripten-constraints.svg?branch=master)](https://travis-ci.org/normanrz/emscripten-constraints)
 
 ## Solvers of interest
 * Z3
