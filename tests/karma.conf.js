@@ -15,11 +15,19 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/libs/chai.js',
-      'z3/loader.js',
-      {pattern: 'z3/wrappedZ3.js', included: false},
-      {pattern: 'z3/z3.js.mem', included: false},
-      'tests/test.*.js'
+      'libs/chai.js',
+      '../require.js',
+      'libs/jquery.js',
+      'libs/mocha.js',
+      '../node_modules/cassowary/bin/c.js',
+      // '../z3/module.z3.js',
+      // '../rhea/module.rhea.js',
+
+      'init.js',
+      // 'z3/loader.js',
+      // {pattern: 'z3/wrappedZ3.js', included: false},
+      // {pattern: '../z3/z3.js.mem', included: false},
+      'test.cassowary.js'
     ],
 
 

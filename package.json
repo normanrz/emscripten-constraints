@@ -14,7 +14,9 @@
     "node": ">= 0.8.x"
   },
   "scripts": {
+    "test": "./node_modules/karma/bin/karma start tests/karma.conf.js ",
+    "test-ci": "./node_modules/karma/bin/karma start tests/karma.conf.js --single-run",
     "test-mocha": "mocha tests/test.*.js",
-    "test": "./node_modules/karma/bin/karma start karma.conf.js --single-run"
+    "benchmark": "./node_modules/karma/bin/karma start tests/karma_bench.conf.js "
   }
 }
