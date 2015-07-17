@@ -2,7 +2,11 @@
   "name": "emscripten-constraints",
   "version": "0.0.1",
   "dependencies": {
-    "cassowary": "0.0.2"
+    "cassowary": "0.0.2",
+    "mocha": "^2.2.5",
+    "requirejs": "^2.1.19",
+    "jquery": "^2.1.4",
+    "chai": "^3.1.0"
   },
   "devDependencies": {
     "mocha": "~1.4.0",
