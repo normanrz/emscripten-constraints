@@ -13,6 +13,10 @@
   "engines": {
     "node": ">= 0.8.x"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/normanrz/emscripten-constraints.git"
+  },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start tests/karma.conf.js --single-run",
     "test-watch": "./node_modules/karma/bin/karma start tests/karma.conf.js",
