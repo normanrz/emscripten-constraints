@@ -1,6 +1,7 @@
 {
   "name": "emscripten-constraints",
   "version": "0.0.1",
+  "license": "MIT",
   "dependencies": {
     "cassowary": "0.0.2",
     "mocha": "^2.2.5",
@@ -9,10 +10,11 @@
     "chai": "^3.1.0"
   },
   "devDependencies": {
-    "mocha": "~1.4.0",
-    "karma": "~0.12.21",
+    "karma": "^0.13.1",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.10",
     "karma-mocha": "~0.1.10",
-    "karma-chrome-launcher": "^0.1.10"
+    "mocha": "~1.4.0"
   },
   "engines": {
     "node": ">= 0.8.x"
@@ -22,9 +24,9 @@
     "url": "git://github.com/normanrz/emscripten-constraints.git"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start tests/karma.conf.js --single-run",
-    "test-watch": "./node_modules/karma/bin/karma start tests/karma.conf.js",
+    "test": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
+    "test-watch": "./node_modules/karma/bin/karma start karma.conf.js",
     "test-mocha": "mocha tests/test.*.js",
-    "benchmark": "./node_modules/karma/bin/karma start tests/karma_bench.conf.js "
+    "benchmark": "./node_modules/karma/bin/karma start karma_bench.conf.js "
   }
 }
