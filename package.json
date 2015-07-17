@@ -13,6 +13,7 @@
     "karma": "^0.13.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.10",
+    "karma-jquery": "^0.1.0",
     "karma-mocha": "~0.1.10",
     "mocha": "~1.4.0"
   },

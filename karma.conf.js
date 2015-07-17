@@ -10,13 +10,12 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'chai', 'jquery-2.1.0'],
 
 
     // list of files / patterns to load in the browser
     files: [
       'node_modules/requirejs/require.js',
-      'node_modules/jquery/dist/jquery.js',
       'node_modules/mocha/mocha.js',
       { pattern: 'node_modules/**/*.js', included: false }, // allow to load any *.js from node_modules by karma web-server
       'node_modules/cassowary/bin/c.js',
@@ -46,8 +45,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
-
+    reporters: ['mocha'],
 
     // web server port
     port: 9876,
