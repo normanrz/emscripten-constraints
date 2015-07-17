@@ -9,7 +9,7 @@ global.XMLHttpRequest = function() {
 
   this.open = function(method, path, isAsynchronous) {
     this.path = "." + path;
-    this.isAsynchronous = (isAsynchronous === undefined) ? true : false;
+    this.isAsynchronous = (isAsynchronous === undefined) ? true : isAsynchronous;
   };
   this.send = function() {
     if (this.isAsynchronous) {
