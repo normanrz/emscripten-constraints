@@ -1,0 +1,3 @@
+[submodule "rhea/rhea"]
+	path = rhea/rhea
+	url = git@github.com:Nocte-/rhea.git
