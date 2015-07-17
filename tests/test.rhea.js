@@ -5,7 +5,7 @@ if (typeof global !== "undefined") {
   }
 }
 
-require(['/base/rhea/module.rhea.js'], function (loadRhea) {
+define(['module.rhea'], function (loadRhea) {
   loadRhea().then(function(rhea) {
     describe("Rhea", function() {
 

@@ -1,10 +1,10 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD
-    define(["/base/loader.js"], factory);
+    define(["loader"], factory);
   } else if (typeof exports === 'object') {
     // Node, CommonJS-like
-    module.exports = factory(require("/base/loader"));
+    module.exports = factory(require("loader"));
   } else {
     // Browser globals (root is window)
     root.z3 = factory(root.loadModule);
@@ -12,7 +12,7 @@
 }(this, function (loadModule) {
   return function loadRhea() {
     return new Promise(function(resolve, reject) {
-      loadModule("rhea.wrapped.js", "/base/rhea/").then(function (rhea) {
+      loadModule("rhea.wrapped.js", require.toUrl("rhea/")).then(function (rhea) {
 
         function ReferenceCounterRoot () {
           var children = [];
@@ -30,8 +30,6 @@
             children = [];
           };
         }
-
-
 
         function ReferenceCounter (self) {
           var counter = 0;
@@ -62,7 +60,7 @@
             }
           };
 
-          console.log("New object", self.constructor.name);
+          // console.log("New object", self.constructor.name);
         }
 
 

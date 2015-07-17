@@ -1,2 +1,3 @@
 emsdk
 node_modules
+*.log

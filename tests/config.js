@@ -32,6 +32,12 @@ requirejs.config({
     // Karma serves files from '/base'
     baseUrl: '/base',
 
+    paths: {
+        'module.rhea': '/base/rhea/module.rhea',
+        'module.z3': '/base/z3/module.z3',
+        'loader': '/base/loader',
+    },
+
     // ask Require.js to load these files (all our tests)
     deps: tests,
 
