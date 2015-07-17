@@ -130,6 +130,7 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             assert.equal(v2.value, 4);
             assert.equal(v3.value, 5);
             assert.equal((v1.value * v1.value) + (v2.value * v2.value), v3.value * v3.value);
+          });
         });
 
         it("Add 50 Equations", function () {
@@ -141,6 +142,7 @@ require(['../rhea/module.rhea'], function (loadRhea) {
               s1.addConstraint(new c.Equation(c1, c.plus(c2, 1)));
               c1 = c2;
             }
+          });
         });
 
         it("Add 50 Inequalities", function () {
@@ -224,7 +226,6 @@ require(['../rhea/module.rhea'], function (loadRhea) {
             assert.isTrue(v3.value >= v3.value - 100);
           });
         });
-
       });
     });
   });

@@ -4,7 +4,7 @@ describe('Z3 Benchmarks', function(){
     var self = this;
     console.time("load z3");
     require(['../z3/module.z3'], function (loadZ3) {
-      loadZ3(function(z3) {
+      loadZ3().then(function(z3) {
         console.timeEnd("successfully loaded z3");
         self.z3 = z3;
         done();
