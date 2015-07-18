@@ -198,31 +198,29 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
         });
 
-        it("should benchmark solving multiple constraints", function () {
-          this._runnable.title += ": " + perfTest(function () {
-            var v1 = new rhea._Module.Variable();
-            var v2 = new rhea._Module.Variable();
+        it("should benchmark solving multiple constraints", perfTest(function () {
+          var v1 = new rhea._Module.Variable();
+          var v2 = new rhea._Module.Variable();
 
-            // v1 - 1 == v2
-            var e1 = rhea._Module.createExpressionVarConst(v1, "-", 1);
-            var eq1 = rhea._Module.createEquationExpVar(e1, v2);
-            var c1 = rhea._Module.createConstraintEq(eq1);
+          // v1 - 1 == v2
+          var e1 = rhea._Module.createExpressionVarConst(v1, "-", 1);
+          var eq1 = rhea._Module.createEquationExpVar(e1, v2);
+          var c1 = rhea._Module.createConstraintEq(eq1);
 
-            // v1 >= 2
-            var eq2 = rhea._Module.createInequalityVarConst(v1, ">=", 2);
-            var c2 = rhea._Module.createConstraintIneq(eq2);
+          // v1 >= 2
+          var eq2 = rhea._Module.createInequalityVarConst(v1, ">=", 2);
+          var c2 = rhea._Module.createConstraintIneq(eq2);
 
-            var s1 = new rhea._Module.SimplexSolver();
-            s1.add_constraint(c1);
-            s1.add_constraint(c2);
-            s1.solve();
+          var s1 = new rhea._Module.SimplexSolver();
+          s1.add_constraint(c1);
+          s1.add_constraint(c2);
+          s1.solve();
 
-            // assert.isTrue(v1.value() - 1 == v2.value())
-            // assert.isTrue(v1.value() >= 2);
+          // assert.isTrue(v1.value() - 1 == v2.value())
+          // assert.isTrue(v1.value() >= 2);
 
-            this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
-          }.bind(this));
-        });
+          this.deleteAll(v1, v2, e1, eq1, c1, eq2, c2, s1);
+        }));
 
       });
 
@@ -258,7 +256,10 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           var e8 = rhea.minus(3, v2);
           var e9 = rhea.times(3, v2);
 
-          var e0 = new rhea.Expression(3);
+          var e10 = new rhea.Expression(3);
+          var e11 = rhea.plus(v1, e1);
+          var e12 = rhea.plus(e1, v1);
+          var e13 = rhea.plus(e1, e2);
 
           assert.equal(e1.evaluate(), 3);
           assert.equal(e2.evaluate(), -1);
@@ -272,9 +273,12 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           assert.equal(e8.evaluate(), 1);
           assert.equal(e9.evaluate(), 6);
 
-          assert.equal(e0.evaluate(), 3);
+          assert.equal(e10.evaluate(), 3);
+          assert.equal(e11.evaluate(), 4);
+          assert.equal(e12.evaluate(), 4);
+          assert.equal(e13.evaluate(), 2);
 
-          this.rc.add(e1, e2, e3, e4, e5, e6, e7, e8, e9, e0);
+          this.rc.add(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13);
         });
 
         it("should create equations", function () {
@@ -372,6 +376,22 @@ require(['../rhea/module.rhea'], function (loadRhea) {
           s1.addConstraint(eq1);
           s1.solve();
           assert.isTrue(v1.value >= v2.value);
+
+          this.rc.add(s1);
+        });
+
+        it("should remove constraints", function () {
+          var v1 = new rhea.Variable({ value: 3 });
+          var v2 = new rhea.Variable({ value: 4 });
+
+          var eq1 = new rhea.Inequality(v1, ">=", v2);
+          var c1 = new rhea.Constraint(eq1);
+
+          var s1 = new rhea.SimplexSolver();
+          s1.addConstraint(c1);
+          s1.solve();
+          assert.isTrue(v1.value >= v2.value);
+          s1.removeConstraint(c1);
 
           this.rc.add(s1);
         });

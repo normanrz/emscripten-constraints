@@ -98,6 +98,15 @@
 
           if (arguments.length == 1 && isNumber(v1)) {
             e = rhea.Module.createExpressionConst(v1);
+          } else if (isExpression(v1) && isExpression(v2)) {
+            e = rhea.Module.createExpressionExpExp(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isExpression(v1) && isVariable(v2)) {
+            e = rhea.Module.createExpressionExpVar(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
+          } else if (isVariable(v1) && isExpression(v2)) {
+            e = rhea.Module.createExpressionVarExp(v1.base, op, v2.base);
+            this.rc.add(v1, v2);
           } else if (isVariable(v1) && isVariable(v2)) {
             e = rhea.Module.createExpressionVarVar(v1.base, op, v2.base);
             this.rc.add(v1, v2);
@@ -253,7 +262,7 @@
 
           this.removeConstraint = function (c) {
             if (isConstraint(c)) {
-              solver.remove_constraint(c);
+              solver.remove_constraint(c.base);
             } else {
               throw new TypeError("Invalid arguments");
             }
@@ -261,7 +270,7 @@
 
           this.removeStay = function (c) {
             if (isVariable(c)) {
-              solver.remove_stay(c);
+              solver.remove_stay(c.base);
             } else {
               throw new TypeError("Invalid arguments");
             }
