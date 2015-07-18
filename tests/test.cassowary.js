@@ -1,3 +1,6 @@
+var c = require("cassowary");
+var assert = require("assert");
+
 describe("Cassowary-js", function () {
   describe("Run", function () {
     it("should solve an equation", function () {
@@ -9,7 +12,7 @@ describe("Cassowary-js", function () {
       var s1 = new c.SimplexSolver();
       s1.addConstraint(eq1);
       s1.solve();
-      assert.isTrue(v1.value - 1 == v2.value);
+      assert.ok(v1.value - 1 == v2.value);
     });
 
     it("should solve an inequality", function () {
@@ -20,7 +23,7 @@ describe("Cassowary-js", function () {
       var s1 = new c.SimplexSolver();
       s1.addConstraint(eq1);
       s1.solve();
-      assert.isTrue(v1.value >= v2.value);
+      assert.ok(v1.value >= v2.value);
     });
 
     it("should solve multiple constraints", function () {
@@ -36,8 +39,8 @@ describe("Cassowary-js", function () {
       s1.addConstraint(eq2);
       s1.solve();
 
-      assert.isTrue(v1.value - 1 == v2.value);
-      assert.isTrue(v1.value >= 2);
+      assert.ok(v1.value - 1 == v2.value);
+      assert.ok(v1.value >= 2);
     });
   });
 });

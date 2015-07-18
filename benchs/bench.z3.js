@@ -1,36 +1,58 @@
-describe("Cassowary-js Benchmarks", function () {
-  describe("Run", function () {
+var loadZ3 = require("../z3/module.z3");
+var assert = require("assert");
+var perfTest = require("./perf_test");
+
+describe('Z3 Benchmarks', function(){
+  var z3 = null;
+  this.timeout("200s");
+
+  before(function(done){
+    console.time("load z3");
+    loadZ3("/z3/").then(function(_z3) {
+      console.timeEnd("successfully loaded z3");
+      z3 = _z3;
+      done();
+    });
+  });
+
+  describe("Run", function() {
     it("Multiple Constraints", perfTest(function () {
+      var c = z3.c;
+
       var v1 = new c.Variable();
       var v2 = new c.Variable();
+
       // v1 - 1 == v2
-      var eq1 = new c.Equation(c.minus(v1, 1), v2);
+      var e1 = c.minus(v1, 1);
+      var eq1 = new c.Equation(e1, v2);
+
       // v1 >= 2
-      var eq2 = new c.Inequality(v1, c.GEQ, 2);
+      var eq2 = new c.Inequality(v1, ">=", 2);
 
       var s1 = new c.SimplexSolver();
       s1.addConstraint(eq1);
       s1.addConstraint(eq2);
       s1.solve();
 
-      console.log(v1.value, v2.value);
+      assert.ok(v1.value - 1 == v2.value);
+      assert.ok(v1.value >= 2);
 
-      assert.isTrue(v1.value - 1 == v2.value);
-      assert.isTrue(v1.value >= 2);
     }));
 
     it("Complex Constraint Set", perfTest(function () {
+      var c = z3.c;
+
       var mouseLocationY = new c.Variable({ value: 10 });
-      var temperature = new c.Variable({ value: 0 });
-      var mercuryTop = new c.Variable({ value: 0 });
-      var mercuryBottom = new c.Variable({ value: 0 });
-      var thermometerTop = new c.Variable({ value: 0 });
-      var thermometerBottom = new c.Variable({ value: 0 });
-      var grayTop = new c.Variable({ value: 0 });
-      var grayBottom = new c.Variable({ value: 0 });
-      var whiteTop = new c.Variable({ value: 0 });
-      var whiteBottom = new c.Variable({ value: 0 });
-      var displayNumber = new c.Variable({ value: 0 });
+      var temperature = new c.Variable();
+      var mercuryTop = new c.Variable();
+      var mercuryBottom = new c.Variable();
+      var thermometerTop = new c.Variable();
+      var thermometerBottom = new c.Variable();
+      var grayTop = new c.Variable();
+      var grayBottom = new c.Variable();
+      var whiteTop = new c.Variable();
+      var whiteBottom = new c.Variable();
+      var displayNumber = new c.Variable();
 
       var constraints = [
         new c.Equation(temperature, mercuryTop),
@@ -45,43 +67,27 @@ describe("Cassowary-js Benchmarks", function () {
       ];
 
       var solver = new c.SimplexSolver();
-      solver.addStay(mouseLocationY);
-      solver.addEditVar(mouseLocationY);
-      constraints.forEach(function (c) {
-        solver.addConstraint(c);
+      // solver.addStay(mouseLocationY);
+      // solver.addEditVar(mouseLocationY);
+      constraints.forEach(function(constraint) {
+        solver.addConstraint(constraint);
       });
       solver.solve();
 
-      assert.equal(mouseLocationY.value, 10);
-      assert.equal(temperature.value, 10);
-      assert.equal(mercuryTop.value, 10);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 10);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 10);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 10);
-      assert.equal(whiteBottom.value, 10);
-      assert.equal(displayNumber.value, 10);
-
-      solver.beginEdit();
-      solver.suggestValue(mouseLocationY, 12);
-      solver.endEdit();
-
-      assert.equal(mouseLocationY.value, 12);
-      assert.equal(temperature.value, 12);
-      assert.equal(mercuryTop.value, 12);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 12);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 12);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 12);
-      assert.equal(whiteBottom.value, 12);
-      assert.equal(displayNumber.value, 12);
+      assert.equal(temperature.value, mercuryTop.value);
+      assert.equal(whiteTop.value, thermometerTop.value);
+      assert.equal(whiteBottom.value, mercuryTop.value);
+      assert.equal(grayTop.value, mercuryTop.value);
+      assert.equal(grayBottom.value, mercuryBottom.value);
+      assert.equal(displayNumber.value, temperature.value);
+      assert.equal(mercuryTop.value, mouseLocationY.value);
+      assert.ok(mercuryTop.value <= thermometerTop.value);
+      assert.equal(mercuryBottom.value, thermometerBottom.value);
     }));
 
     it("Pythagorean Theorem", perfTest(function () {
+      var c = z3.c;
+
       var v1 = new c.Variable();
       var v2 = new c.Variable();
       var v3 = new c.Variable();
@@ -107,6 +113,8 @@ describe("Cassowary-js Benchmarks", function () {
     }));
 
     it("Add 50 Equations", perfTest(function () {
+      var c = z3.c;
+
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       for (var i = 0; i < 50; i++) {
@@ -117,6 +125,8 @@ describe("Cassowary-js Benchmarks", function () {
     }));
 
     it("Add 50 Inequalities", perfTest(function () {
+      var c = z3.c;
+
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       for (var i = 0; i < 50; i++) {
@@ -127,6 +137,8 @@ describe("Cassowary-js Benchmarks", function () {
     }));
 
     it("Add & Remove 50 Equations", perfTest(function () {
+      var c = z3.c;
+
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       var equations = []
@@ -143,6 +155,8 @@ describe("Cassowary-js Benchmarks", function () {
     }));
 
     it("Add & Remove 50 Inequalities", perfTest(function () {
+      var c = z3.c;
+
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       var equations = []
@@ -159,6 +173,8 @@ describe("Cassowary-js Benchmarks", function () {
     }));
 
     it("All In One Test", perfTest(function () {
+      var c = z3.c;
+
       var v1 = new c.Variable();
       var v2 = new c.Variable();
       var v3 = new c.Variable();
@@ -179,15 +195,15 @@ describe("Cassowary-js Benchmarks", function () {
 
       s1.solve();
 
-      assert.isTrue(v1.value == v2.value + 100);
-      assert.isTrue(v2.value == v3.value * 8);
-      assert.isTrue(v3.value == v4.value - 56.87);
-      assert.isTrue(v4.value == v5.value / 4);
+      assert.ok(v1.value == v2.value + 100);
+      assert.ok(v2.value == v3.value * 8);
+      assert.ok(v3.value == v4.value - 56.87);
+      assert.ok(v4.value == v5.value / 4);
 
-      assert.isTrue(v1.value >= 10000);
-      assert.isTrue(v2.value <= v1.value * 500.4);
-      assert.isTrue(v5.value >= v4.value + 250.2);
-      assert.isTrue(v3.value >= v3.value - 100);
+      assert.ok(v1.value >= 10000);
+      assert.ok(v2.value <= v1.value * 500.4);
+      assert.ok(v5.value >= v4.value + 250.2);
+      assert.ok(v3.value >= v3.value - 100);
     }));
 
   });

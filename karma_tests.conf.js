@@ -10,21 +10,21 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'requirejs', 'chai', 'jquery-2.1.0'],
+    frameworks: ['mocha'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/cassowary/bin/c.js',
-
-      { pattern: 'tests/*.js', included: false },
-      { pattern: 'rhea/*.js', included: false },
-      { pattern: 'z3/*.js', included: false },
-      { pattern: 'z3/*.js.mem', included: false },
-      { pattern: 'loader.js', included: false },
-
-      'tests/config.js'
+      'tests/tests.bundle.js',
+      { pattern: 'rhea/rhea.wrapped.js', included: false },
+      { pattern: 'z3/z3.wrapped.js', included: false },
+      { pattern: 'z3/z3.js.mem', included: false }
     ],
+
+    proxies: {
+      '/rhea/': '/base/rhea/',
+      '/z3/': '/base/z3/'
+    },
 
 
     // list of files to exclude
@@ -80,10 +80,7 @@ module.exports = function(config) {
     plugins: [
       'karma-mocha',
       'karma-mocha-reporter',
-      'karma-requirejs',
-      'karma-chai',
-      'karma-jquery',
-      'karma-chrome-launcher',
+      'karma-chrome-launcher'
     ]
   });
 

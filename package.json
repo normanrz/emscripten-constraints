@@ -4,18 +4,13 @@
   "license": "MIT",
   "dependencies": {
     "cassowary": "0.0.2",
-    "requirejs": "^2.1.19",
-    "jquery": "^2.1.4"
+    "browserify": "11.0.0"
   },
   "devDependencies": {
-    "chai": "^3.1.0",
     "karma": "^0.13.1",
-    "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.10",
-    "karma-jquery": "^0.1.0",
     "karma-mocha": "^0.2.0",
     "karma-mocha-reporter": "^1.0.2",
-    "karma-requirejs": "^0.2.2",
     "mocha": "^2.2.5"
   },
   "engines": {
@@ -26,9 +21,10 @@
     "url": "git://github.com/normanrz/emscripten-constraints.git"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
-    "test-watch": "./node_modules/karma/bin/karma start karma.conf.js",
+    "postinstall": "./node_modules/.bin/browserify tests/tests.js -o tests/tests.bundle.js && ./node_modules/.bin/browserify benchs/benchs.js -o benchs/benchs.bundle.js",
+    "test": "./node_modules/karma/bin/karma start karma_tests.conf.js --single-run",
+    "test-watch": "./node_modules/karma/bin/karma start karma_tests.conf.js",
     "test-mocha": "mocha tests/test.*.js",
-    "benchmark": "./node_modules/karma/bin/karma start karma_bench.conf.js --single-run"
+    "benchmark": "./node_modules/karma/bin/karma start karma_benchs.conf.js --single-run"
   }
 }

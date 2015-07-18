@@ -1,17 +1,19 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Tests</title>
+  <title>Benchmarks</title>
   <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 </head>
 <body>
   <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
-  <script>mocha.setup('bdd')</script>
-  <script src="init.js"></script>
-  <script src="tests.bundle.js"></script>
   <script>
-    mocha.timeout(20000);
+    mocha.setup('bdd');
+    mocha.timeout(120000);
+    mocha.slow(120000);
+  </script>
+  <script src="benchs.bundle.js"></script>
+  <script>
     mocha.checkLeaks();
     mocha.run();
   </script>

@@ -1,18 +1,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD
-    define(["loader"], factory);
+    define(["../loader"], factory);
   } else if (typeof exports === 'object') {
     // Node, CommonJS-like
-    module.exports = factory(require("loader"));
+    module.exports = factory(require("../loader"));
   } else {
     // Browser globals (root is window)
     root.z3 = factory(root.loadModule);
   }
 }(this, function (loadModule) {
-  return function loadZ3() {
+  return function loadZ3(directory) {
     return new Promise(function(resolve, reject) {
-      loadModule("z3.wrapped.js", require.toUrl("z3/")).then(function(z3) {
+      loadModule("z3.wrapped.js", directory).then(function(z3) {
         var memFileTimeOut = 1000;
         setTimeout(function() {
 
