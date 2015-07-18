@@ -19,6 +19,29 @@ rhea::linear_expression createExpressionVarVar(rhea::variable &v1, std::string o
   }
 }
 
+rhea::linear_expression createExpressionExpExp(rhea::linear_expression &v1, std::string op, rhea::linear_expression &v2) {
+  if (op == "+") {
+    return rhea::linear_expression(v1 + v2);
+  } else {
+    return rhea::linear_expression(v1 - v2);
+  }
+}
+
+rhea::linear_expression createExpressionExpVar(rhea::linear_expression &v1, std::string op, rhea::variable &v2) {
+  if (op == "+") {
+    return rhea::linear_expression(v1 + v2);
+  } else {
+    return rhea::linear_expression(v1 - v2);
+  }
+}
+rhea::linear_expression createExpressionVarExp(rhea::variable &v1, std::string op, rhea::linear_expression &v2) {
+  if (op == "+") {
+    return rhea::linear_expression(v1 + v2);
+  } else {
+    return rhea::linear_expression(v1 - v2);
+  }
+}
+
 rhea::linear_expression createExpressionVarConst(rhea::variable &v1, std::string op, double v2) {
   if (op == "+") {
     return rhea::linear_expression(v1 + v2);
@@ -144,6 +167,9 @@ EMSCRIPTEN_BINDINGS(my_module)
   function("test", &test);
 
   function("createExpressionConst", &createExpressionConst);
+  function("createExpressionExpExp", &createExpressionExpExp);
+  function("createExpressionExpVar", &createExpressionExpVar);
+  function("createExpressionVarExp", &createExpressionVarExp);
   function("createExpressionVarVar", &createExpressionVarVar);
   function("createExpressionVarConst", &createExpressionVarConst);
   function("createExpressionConstVar", &createExpressionConstVar);

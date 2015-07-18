@@ -126,6 +126,8 @@ require(['/base/rhea/module.rhea.js'], function (loadRhea) {
           assert.equal(v2.value, 4);
           assert.equal(v3.value, 5);
           assert.equal((v1.value * v1.value) + (v2.value * v2.value), v3.value * v3.value);
+
+          this.rc.add(s1);
         }));
 
         it("Add 50 Equations", perfTest(function () {
@@ -136,6 +138,7 @@ require(['/base/rhea/module.rhea.js'], function (loadRhea) {
             s1.addConstraint(new rhea.Equation(c1, rhea.plus(c2, 1)));
             c1 = c2;
           }
+          this.rc.add(s1);
         }));
 
         it("Add 50 Inequalities", perfTest(function () {
@@ -146,38 +149,43 @@ require(['/base/rhea/module.rhea.js'], function (loadRhea) {
             s1.addConstraint(new rhea.Inequality(c1, rhea.GEQ, rhea.plus(c2, 1)));
             c1 = c2;
           }
+          this.rc.add(s1);
         }));
 
         it("Add & Remove 50 Equations", perfTest(function () {
           var s1 = new rhea.SimplexSolver();
-          var c1 = new rhea.Variable();
+          var v1 = new rhea.Variable();
           var equations = []
           for (var i = 0; i < 50; i++) {
-            var c2 = new rhea.Variable();
-            var eq = new rhea.Equation(c1, c2);
-            equations.push(eq);
-            s1.addConstraint(eq);
-            c1 = c2;
+            var v2 = new rhea.Variable();
+            var eq = new rhea.Equation(v1, v2);
+            var c1 = new rhea.Constraint(eq);
+            equations.push(c1);
+            s1.addConstraint(c1);
+            v1 = v2;
           }
           for (var i = 0; i < equations.length; i++) {
             s1.removeConstraint(equations[i]);
           }
+          this.rc.add(s1);
         }));
 
         it("Add & Remove 50 Inequalities", perfTest(function () {
           var s1 = new rhea.SimplexSolver();
-          var c1 = new rhea.Variable();
+          var v1 = new rhea.Variable();
           var equations = []
           for (var i = 0; i < 50; i++) {
-            var c2 = new rhea.Variable();
-            var eq = new rhea.Inequality(c1, rhea.GEQ, c2);
-            equations.push(eq);
-            s1.addConstraint(eq);
-            c1 = c2;
+            var v2 = new rhea.Variable();
+            var eq = new rhea.Inequality(v1, rhea.GEQ, v2);
+            var c1 = new rhea.Constraint(eq);
+            equations.push(c1);
+            s1.addConstraint(c1);
+            v1 = v2;
           }
           for (var i = 0; i < equations.length; i++) {
             s1.removeConstraint(equations[i]);
           }
+          this.rc.add(s1);
         }));
 
         it("All In One Test", perfTest(function () {
@@ -210,6 +218,8 @@ require(['/base/rhea/module.rhea.js'], function (loadRhea) {
           assert.isTrue(v2.value <= v1.value * 500.4);
           assert.isTrue(v5.value >= v4.value + 250.2);
           assert.isTrue(v3.value >= v3.value - 100);
+
+          this.rc.add(s1);
         }));
 
       });
