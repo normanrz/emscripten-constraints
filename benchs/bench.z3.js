@@ -72,7 +72,13 @@ describe('Z3 Benchmarks', function(){
       constraints.forEach(function(constraint) {
         solver.addConstraint(constraint);
       });
-      solver.solve();
+
+      for (var i = 0; i <= 100; i++) {
+        var eq = new c.Equation(mouseLocationY, i);
+        solver.addConstraint(eq);
+        solver.solve();
+        solver.removeConstraint(eq);
+      }
 
       assert.equal(temperature.value, mercuryTop.value);
       assert.equal(whiteTop.value, thermometerTop.value);
@@ -83,6 +89,7 @@ describe('Z3 Benchmarks', function(){
       assert.equal(mercuryTop.value, mouseLocationY.value);
       assert.ok(mercuryTop.value <= thermometerTop.value);
       assert.equal(mercuryBottom.value, thermometerBottom.value);
+
     }));
 
     it("Pythagorean Theorem", perfTest(function () {

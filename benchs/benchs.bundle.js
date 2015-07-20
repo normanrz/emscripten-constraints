@@ -26,16 +26,16 @@ describe("Cassowary-js Benchmarks", function () {
 
     it("Complex Constraint Set", perfTest(function () {
       var mouseLocationY = new c.Variable({ value: 10 });
-      var temperature = new c.Variable({ value: 0 });
-      var mercuryTop = new c.Variable({ value: 0 });
-      var mercuryBottom = new c.Variable({ value: 0 });
-      var thermometerTop = new c.Variable({ value: 0 });
-      var thermometerBottom = new c.Variable({ value: 0 });
-      var grayTop = new c.Variable({ value: 0 });
-      var grayBottom = new c.Variable({ value: 0 });
-      var whiteTop = new c.Variable({ value: 0 });
-      var whiteBottom = new c.Variable({ value: 0 });
-      var displayNumber = new c.Variable({ value: 0 });
+      var temperature = new c.Variable();
+      var mercuryTop = new c.Variable();
+      var mercuryBottom = new c.Variable();
+      var thermometerTop = new c.Variable();
+      var thermometerBottom = new c.Variable();
+      var grayTop = new c.Variable();
+      var grayBottom = new c.Variable();
+      var whiteTop = new c.Variable();
+      var whiteBottom = new c.Variable();
+      var displayNumber = new c.Variable();
 
       var constraints = [
         new c.Equation(temperature, mercuryTop),
@@ -57,33 +57,21 @@ describe("Cassowary-js Benchmarks", function () {
       });
       solver.solve();
 
-      assert.equal(mouseLocationY.value, 10);
-      assert.equal(temperature.value, 10);
-      assert.equal(mercuryTop.value, 10);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 10);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 10);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 10);
-      assert.equal(whiteBottom.value, 10);
-      assert.equal(displayNumber.value, 10);
+      //solver.beginEdit();
+      for (var i = 0; i <= 100; i++) {
+        solver.suggestValue(mouseLocationY, i);
+      }
+      //solver.endEdit();
 
-      solver.beginEdit();
-      solver.suggestValue(mouseLocationY, 12);
-      solver.endEdit();
-
-      assert.equal(mouseLocationY.value, 12);
-      assert.equal(temperature.value, 12);
-      assert.equal(mercuryTop.value, 12);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 12);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 12);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 12);
-      assert.equal(whiteBottom.value, 12);
-      assert.equal(displayNumber.value, 12);
+      assert.equal(temperature.value, mercuryTop.value);
+      assert.equal(whiteTop.value, thermometerTop.value);
+      assert.equal(whiteBottom.value, mercuryTop.value);
+      assert.equal(grayTop.value, mercuryTop.value);
+      assert.equal(grayBottom.value, mercuryBottom.value);
+      assert.equal(displayNumber.value, temperature.value);
+      assert.equal(mercuryTop.value, mouseLocationY.value);
+      assert.ok(mercuryTop.value <= thermometerTop.value);
+      assert.equal(mercuryBottom.value, thermometerBottom.value);
     }));
 
     it("Pythagorean Theorem", perfTest(function () {
@@ -254,16 +242,16 @@ describe("Rhea Benchmarks", function() {
     it("Complex Constraint Set", perfTest(function () {
 
       var mouseLocationY = new rhea.Variable({ value: 10 });
-      var temperature = new rhea.Variable({ value: 0 });
-      var mercuryTop = new rhea.Variable({ value: 0 });
-      var mercuryBottom = new rhea.Variable({ value: 0 });
-      var thermometerTop = new rhea.Variable({ value: 0 });
-      var thermometerBottom = new rhea.Variable({ value: 0 });
-      var grayTop = new rhea.Variable({ value: 0 });
-      var grayBottom = new rhea.Variable({ value: 0 });
-      var whiteTop = new rhea.Variable({ value: 0 });
-      var whiteBottom = new rhea.Variable({ value: 0 });
-      var displayNumber = new rhea.Variable({ value: 0 });
+      var temperature = new rhea.Variable();
+      var mercuryTop = new rhea.Variable();
+      var mercuryBottom = new rhea.Variable();
+      var thermometerTop = new rhea.Variable();
+      var thermometerBottom = new rhea.Variable();
+      var grayTop = new rhea.Variable();
+      var grayBottom = new rhea.Variable();
+      var whiteTop = new rhea.Variable();
+      var whiteBottom = new rhea.Variable();
+      var displayNumber = new rhea.Variable();
 
       var constraints = [
         new rhea.Equation(temperature, mercuryTop),
@@ -283,33 +271,21 @@ describe("Rhea Benchmarks", function() {
       solver.addConstraints(constraints);
       solver.solve();
 
-      assert.equal(mouseLocationY.value, 10);
-      assert.equal(temperature.value, 10);
-      assert.equal(mercuryTop.value, 10);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 10);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 10);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 10);
-      assert.equal(whiteBottom.value, 10);
-      assert.equal(displayNumber.value, 10);
+      //solver.beginEdit();
+      for (var i = 0; i <= 100; i++) {
+        solver.suggestValue(mouseLocationY, i);
+      }
+      //solver.endEdit();
 
-      solver.beginEdit();
-      solver.suggestValue(mouseLocationY, 12);
-      solver.endEdit();
-
-      assert.equal(mouseLocationY.value, 12);
-      assert.equal(temperature.value, 12);
-      assert.equal(mercuryTop.value, 12);
-      assert.equal(mercuryBottom.value, 0);
-      assert.equal(thermometerTop.value, 12);
-      assert.equal(thermometerBottom.value, 0);
-      assert.equal(grayTop.value, 12);
-      assert.equal(grayBottom.value, 0);
-      assert.equal(whiteTop.value, 12);
-      assert.equal(whiteBottom.value, 12);
-      assert.equal(displayNumber.value, 12);
+      assert.equal(temperature.value, mercuryTop.value);
+      assert.equal(whiteTop.value, thermometerTop.value);
+      assert.equal(whiteBottom.value, mercuryTop.value);
+      assert.equal(grayTop.value, mercuryTop.value);
+      assert.equal(grayBottom.value, mercuryBottom.value);
+      assert.equal(displayNumber.value, temperature.value);
+      assert.equal(mercuryTop.value, mouseLocationY.value);
+      assert.ok(mercuryTop.value <= thermometerTop.value);
+      assert.equal(mercuryBottom.value, thermometerBottom.value);
 
       this.rc.add(solver);
     }));
@@ -511,7 +487,13 @@ describe('Z3 Benchmarks', function(){
       constraints.forEach(function(constraint) {
         solver.addConstraint(constraint);
       });
-      solver.solve();
+
+      for (var i = 0; i <= 100; i++) {
+        var eq = new c.Equation(mouseLocationY, i);
+        solver.addConstraint(eq);
+        solver.solve();
+        solver.removeConstraint(eq);
+      }
 
       assert.equal(temperature.value, mercuryTop.value);
       assert.equal(whiteTop.value, thermometerTop.value);
@@ -522,6 +504,7 @@ describe('Z3 Benchmarks', function(){
       assert.equal(mercuryTop.value, mouseLocationY.value);
       assert.ok(mercuryTop.value <= thermometerTop.value);
       assert.equal(mercuryBottom.value, thermometerBottom.value);
+
     }));
 
     it("Pythagorean Theorem", perfTest(function () {
