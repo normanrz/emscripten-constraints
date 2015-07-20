@@ -1,7 +1,7 @@
 module("users.timfelgentreff.rhea").requires().toRun(function() {
     var rhea = null;
     require(['../rhea/module.rhea'], function (loadRhea) {
-        loadRhea(function(_rhea) {
+        loadRhea("/rhea/").then(function(_rhea) {
             rhea = extendBindings(_rhea);
         })
     });

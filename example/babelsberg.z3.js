@@ -1,7 +1,7 @@
 module("users.timfelgentreff.z3").requires().toRun(function() {
     var z3 = null;
-    require(['../z3/module.z3'], function (loadRhea) {
-        loadRhea(function(_z3) {
+    require(['../z3/module.z3'], function (loadZ3) {
+        loadZ3('/z3/').then(function(_z3) {
             z3 = extendBindings(_z3.c);
         })
     });
