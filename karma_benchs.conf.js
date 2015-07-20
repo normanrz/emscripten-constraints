@@ -71,7 +71,7 @@ module.exports = function(config) {
         }
     },
 
-    browserNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 8*60000, // 8min (so build does not timeout)
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
