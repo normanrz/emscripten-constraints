@@ -3,24 +3,27 @@ var assert = require("assert");
 var perfTest = require("./perf_test");
 
 describe('Z3 Benchmarks', function(){
-  var z3 = null;
+  var c = null;
   this.timeout("200s");
 
   before(function(done){
     console.time("load z3");
     loadZ3("/z3/").then(function(_z3) {
       console.timeEnd("successfully loaded z3");
-      z3 = _z3;
+      c = _z3.c;
       done();
     });
   });
 
   describe("Run", function() {
-    it("Multiple Constraints", perfTest(function () {
-      var c = z3.c;
 
-      var v1 = new c.Variable();
-      var v2 = new c.Variable();
+    it("Solve nothing", perfTest(function () {
+      new c.SimplexSolver().solve();
+    }));
+
+    it("Multiple Constraints", perfTest(function () {
+      var v1 = new c.Variable({ value: 0 });
+      var v2 = new c.Variable({ value: 0 });
 
       // v1 - 1 == v2
       var e1 = c.minus(v1, 1);
@@ -39,20 +42,18 @@ describe('Z3 Benchmarks', function(){
 
     }));
 
-    it("Complex Constraint Set", perfTest(function () {
-      var c = z3.c;
-
-      var mouseLocationY = new c.Variable({ value: 10 });
-      var temperature = new c.Variable();
-      var mercuryTop = new c.Variable();
-      var mercuryBottom = new c.Variable();
-      var thermometerTop = new c.Variable();
-      var thermometerBottom = new c.Variable();
-      var grayTop = new c.Variable();
-      var grayBottom = new c.Variable();
-      var whiteTop = new c.Variable();
-      var whiteBottom = new c.Variable();
-      var displayNumber = new c.Variable();
+    it("Complex Drag Simulation", perfTest(function () {
+      var mouseLocationY = new c.Variable({ value: 0 });
+      var temperature = new c.Variable({ value: 0 });
+      var mercuryTop = new c.Variable({ value: 0 });
+      var mercuryBottom = new c.Variable({ value: 0 });
+      var thermometerTop = new c.Variable({ value: 0 });
+      var thermometerBottom = new c.Variable({ value: 0 });
+      var grayTop = new c.Variable({ value: 0 });
+      var grayBottom = new c.Variable({ value: 0 });
+      var whiteTop = new c.Variable({ value: 0 });
+      var whiteBottom = new c.Variable({ value: 0 });
+      var displayNumber = new c.Variable({ value: 0 });
 
       var constraints = [
         new c.Equation(temperature, mercuryTop),
@@ -67,16 +68,16 @@ describe('Z3 Benchmarks', function(){
       ];
 
       var solver = new c.SimplexSolver();
-      // solver.addStay(mouseLocationY);
-      // solver.addEditVar(mouseLocationY);
-      constraints.forEach(function(constraint) {
-        solver.addConstraint(constraint);
-      });
+      for (var i = 0; i < constraints.length; i++) {
+        solver.addConstraint(constraints[i]);
+      }
+      solver.solve();
 
-      for (var i = 0; i <= 100; i++) {
+      for (var i = 0; i <= 10; i++) {
         var eq = new c.Equation(mouseLocationY, i);
         solver.addConstraint(eq);
         solver.solve();
+        assert.equal(mouseLocationY.value, i);
         solver.removeConstraint(eq);
       }
 
@@ -93,8 +94,6 @@ describe('Z3 Benchmarks', function(){
     }));
 
     it("Pythagorean Theorem", perfTest(function () {
-      var c = z3.c;
-
       var v1 = new c.Variable();
       var v2 = new c.Variable();
       var v3 = new c.Variable();
@@ -120,8 +119,6 @@ describe('Z3 Benchmarks', function(){
     }));
 
     it("Add 50 Equations", perfTest(function () {
-      var c = z3.c;
-
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       for (var i = 0; i < 50; i++) {
@@ -132,8 +129,6 @@ describe('Z3 Benchmarks', function(){
     }));
 
     it("Add 50 Inequalities", perfTest(function () {
-      var c = z3.c;
-
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       for (var i = 0; i < 50; i++) {
@@ -144,8 +139,6 @@ describe('Z3 Benchmarks', function(){
     }));
 
     it("Add & Remove 50 Equations", perfTest(function () {
-      var c = z3.c;
-
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       var equations = []
@@ -162,8 +155,6 @@ describe('Z3 Benchmarks', function(){
     }));
 
     it("Add & Remove 50 Inequalities", perfTest(function () {
-      var c = z3.c;
-
       var s1 = new c.SimplexSolver();
       var c1 = new c.Variable();
       var equations = []
@@ -179,9 +170,169 @@ describe('Z3 Benchmarks', function(){
       }
     }));
 
-    it("All In One Test", perfTest(function () {
-      var c = z3.c;
+    it("dbAddSim", perfTest(function () {
+      var x = new c.Variable();
+      var y = new c.Variable();
+      var z = new c.Variable();
 
+      var constraints = [
+        // o.x == o.z - o.y
+        new c.Equation(x, c.minus(z, y)),
+        // o.y == o.z - o.x
+        new c.Equation(y, c.minus(z, x)),
+        // o.z == o.x + o.y;
+        new c.Equation(z, c.plus(x, y))
+      ];
+
+      var solver = new c.SimplexSolver();
+      solver.addStay(x);
+      solver.addEditVar(x);
+      constraints.forEach(function (c) {
+        solver.addConstraint(c);
+      });
+
+      for (var i = 0; i < 10; i++) {
+        solver.suggestValue(x, i);
+        // o.x + o.y == o.z
+        assert.ok(x.value + y.value == z.value);
+      }
+
+    }));
+
+    it("clAddSim", perfTest(function () {
+      var x = new c.Variable();
+      var y = new c.Variable();
+      var z = new c.Variable();
+
+      var solver = new c.SimplexSolver();
+      solver.addStay(x);
+      solver.addEditVar(x);
+      // o.x + o.y == o.z
+      solver.addConstraint(new c.Equation(c.plus(x,y), z));
+
+      for (var i = 0; i < 10; i++) {
+        solver.suggestValue(x, i);
+        // o.x + o.y == o.z
+        assert.ok(x.value + y.value == z.value);
+      }
+
+    }));
+
+    it("clDrag2DSim", perfTest(function () {
+      var mouseX = new c.Variable({ value: 100 });
+      var mouseY = new c.Variable({ value: 100 });
+      var wndW = new c.Variable({ value: 100 });
+      var wndH = new c.Variable({ value: 100 });
+      var comp1W = new c.Variable({ value: 70 });
+      var comp1Display = new c.Variable({ value: 0 });
+      var comp2W = new c.Variable({ value: 30 });
+      var comp2Display = new c.Variable({ value: 0 });
+
+      var constraints = [
+        // wnd.w == mouse.x
+        new c.Equation(wndW, mouseX),
+        // wnd.h == mouse.y
+        new c.Equation(wndH, mouseY),
+        // wnd.w <= 400
+        new c.Inequality(wndW, c.LEQ, 400),
+        // wnd.h <= 250
+        new c.Inequality(wndH, c.LEQ, 250),
+        // comp1.w+comp2.w == wnd.w
+        new c.Equation(c.plus(comp1W,comp2W), wndW),
+        // comp1.display == wnd.w
+        new c.Equation(comp1Display, wndW),
+        // comp2.display == wnd.h
+        new c.Equation(comp2Display, wndH)
+      ];
+
+      var solver = new c.SimplexSolver();
+      solver.addStay(mouseX);
+      solver.addEditVar(mouseX);
+      solver.addStay(mouseY);
+      solver.addEditVar(mouseY);
+      constraints.forEach(function (c) {
+        solver.addConstraint(c);
+      });
+
+      var sheer = 1;
+
+      for(var i = 0; i < 10; i++) {
+        var eq1 = new c.Equation(mouseX, 100+i);
+        solver.addConstraint(eq1);
+        solver.solve();
+        assert.equal(mouseX.value, 100+i);
+
+        if(i % sheer == 0) {
+          var eq2 = new c.Equation(mouseY, 100+i);
+          solver.addConstraint(eq2);
+          solver.solve();
+          assert.equal(mouseY.value, 100+i);
+          solver.removeConstraint(eq2);
+        }
+
+        solver.removeConstraint(eq1);
+      }
+
+    }));
+
+    it("clDrag2DSimFastX", perfTest(function () {
+      var mouseX = new c.Variable({ value: 100 });
+      var mouseY = new c.Variable({ value: 100 });
+      var wndW = new c.Variable({ value: 100 });
+      var wndH = new c.Variable({ value: 100 });
+      var comp1W = new c.Variable({ value: 70 });
+      var comp1Display = new c.Variable({ value: 0 });
+      var comp2W = new c.Variable({ value: 30 });
+      var comp2Display = new c.Variable({ value: 0 });
+
+      var constraints = [
+        // wnd.w == mouse.x
+        new c.Equation(wndW, mouseX),
+        // wnd.h == mouse.y
+        new c.Equation(wndH, mouseY),
+        // wnd.w <= 400
+        new c.Inequality(wndW, c.LEQ, 400),
+        // wnd.h <= 250
+        new c.Inequality(wndH, c.LEQ, 250),
+        // comp1.w+comp2.w == wnd.w
+        new c.Equation(c.plus(comp1W,comp2W), wndW),
+        // comp1.display == wnd.w
+        new c.Equation(comp1Display, wndW),
+        // comp2.display == wnd.h
+        new c.Equation(comp2Display, wndH)
+      ];
+
+      var solver = new c.SimplexSolver();
+      solver.addStay(mouseX);
+      solver.addEditVar(mouseX);
+      solver.addStay(mouseY);
+      solver.addEditVar(mouseY);
+      constraints.forEach(function (c) {
+        solver.addConstraint(c);
+      });
+
+      var sheer = 3;
+
+      for(var i = 0; i < 10; i++) {
+        var eq1 = new c.Equation(mouseX, 100+i);
+        solver.addConstraint(eq1);
+        solver.solve();
+        assert.equal(mouseX.value, 100+i);
+
+        if(i % sheer == 0) {
+          var eq2 = new c.Equation(mouseY, 100+i);
+          solver.addConstraint(eq2);
+          solver.solve();
+          assert.equal(mouseY.value, 100+i);
+          solver.removeConstraint(eq2);
+        }
+
+        solver.removeConstraint(eq1);
+      }
+
+    }));
+
+    it("All In One Test", perfTest(function () {
       var v1 = new c.Variable();
       var v2 = new c.Variable();
       var v3 = new c.Variable();
