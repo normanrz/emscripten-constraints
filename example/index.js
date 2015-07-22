@@ -29,7 +29,7 @@ contentLoaded(window, function() {
         width: 50, height: 100, left: 75, top: 350, angle: 0,
         fill: 'rgba(255,165,0,0.5)'
     });
-    
+
     var purple = new fabric.Rect({
         width: 50, height: 100, left: 75, top: 350, angle: 0,
         fill: 'rgba(80,0,80,0.5)'
@@ -43,7 +43,7 @@ contentLoaded(window, function() {
         orange: orange,
         purple: purple
     };
-    
+
     [red, green, blue, yellow, orange, purple].forEach(function(rect) {
         rect.getWidth = function() {
             return this.scaleX * bbb.readonly(this.width);
