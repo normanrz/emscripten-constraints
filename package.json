@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
+    "browserify": "11.0.0",
     "cassowary": "0.0.2",
-    "browserify": "11.0.0"
+    "requirejs": "^2.1.19"
   },
   "devDependencies": {
     "karma": "^0.13.1",
