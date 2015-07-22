@@ -2134,6 +2134,11 @@ require("./test.z3");
               this.addConstraint = function(eq) {
                 _this.constraints.push(eq);
               };
+              this.addConstraints = function (constraints) {
+                for(var i = 0; i < constraints.length; i++) {
+                  this.addConstraint(constraints[i]);
+                }
+              };
               this.solve = function() {
                 var problemString = this.getProblemString();
                 var solutionString = z3.solveProblem(problemString);

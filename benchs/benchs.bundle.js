@@ -2520,7 +2520,6 @@ var l=this.rows.get(this._objective);l.setVariable(i,b.strength.symbolicWeight.v
             } else if (isEquation(c) || isInequality(c)) {
               this.addConstraint(new Constraint(c));
             } else {
-              console.log(c)
               throw new TypeError("Invalid arguments");
             }
           };
