@@ -130,6 +130,10 @@
                 }
               }
               this.getProblemString = function() {
+                if (this.constraints.length == 0) {
+                  return "";
+                }
+
                 var constraintString = this.constraints.map(function(el) {
                   return el.toString();
                 }).join("\n");

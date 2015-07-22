@@ -2744,6 +2744,10 @@ var l=this.rows.get(this._objective);l.setVariable(i,b.strength.symbolicWeight.v
                 }
               }
               this.getProblemString = function() {
+                if (this.constraints.length == 0) {
+                  return "";
+                }
+
                 var constraintString = this.constraints.map(function(el) {
                   return el.toString();
                 }).join("\n");
