@@ -1,32 +1,22 @@
 # Emscripten-based constraint solvers (API Design and toolchain)
 [![Build Status](https://travis-ci.org/normanrz/emscripten-constraints.svg?branch=master)](https://travis-ci.org/normanrz/emscripten-constraints)
 
-## Solvers of interest
-* Z3
-* Ceres
-* Cassowary (JS vs C implementation)
-* Yices (Not sure if compiles)
-* DeltaBlue (Deprecated?)
-* Kodkod (Java)
+## Implemented solvers
+* [Z3](https://github.com/Z3Prover/z3)
+* [Cassowary JS](https://github.com/slightlyoff/cassowary.js/)
+* [rhea](https://github.com/Nocte-/rhea)
 
-## Tasks
-* Initial Compiliation
-* API Wrapping
-  * Asynchronous loading
-  * On demand
-* Toolchain for Compilation
+## Code structure
+* Z3 and rhea are accessible through the `z3/module.z3.js` and `rhea/module.rhea.js` modules. These modules expose a promise-based loader.
 
-### Babelsberg API requirements
-* `Solver#always(opts, func) : Constraint` Not much to do, just setting up the `Constraint` object from Babelsberg Core. Also store the constraint. You'll need it for solving.
-* `Solver#contraintVariableFor(object, property) : Variable` Create your own external Variable object store it. You will need it for solving.
-* `Solver#solveOnce(constraint)` Gives you a new constraint (e.g. new position of rect) and you should solve. 
-* `Solver#solve()` Solve
-* `Variable#suggestValue(value)`
+```
+var loadRhea = require("./rhea/module.rhea");
+loadRhea("/rhea/").then(function (rhea) {
+  doSomething(rhea);
+});
+```
 
-## References
-* http://emscripten.org
-* http://repl.it/languages
-
-## Literature
-* http://opus.kobv.de/ubp/volltexte/2014/6729/pdf/tbhpi81.pdf
-* http://adamrehn.com/articles/creating-javascript-bindings-for-c-cxx-libraries-with-emscripten
+* Tests, Benchmarks and Examples can be accessed by starting a web server in this repo's root directory and navigating to the respective folder.
+* Basic BabelsbergJS implementations can be found in the `examples` folder.
+* Tests and Benchmarks can be run in the browser or with Karma.
+* Need to run `npm install` to use any of this.
