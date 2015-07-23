@@ -99,17 +99,38 @@ contentLoaded(window, function() {
         }
 
         // remove old constraints
-        // Object.keys(window.rects).each(function(name) {
-        //     bbb.unconstrainAll(window.rects[name]);
-        // });
+        bbb.unconstrainAll(p1);
+        bbb.unconstrainAll(p2);
+        bbb.unconstrainAll(p3);
+        bbb.unconstrainAll(p4);
+        bbb.unconstrainAll(m1);
+        bbb.unconstrainAll(m2);
+        bbb.unconstrainAll(m3);
+        bbb.unconstrainAll(m4);
 
-        // codeEditor.style.border = "3px solid green";
-        // // try {
-        //     Babelsberg.execute(this.value, window.rects);
-        // } catch (e) {
-        //     codeEditor.style.border = "3px solid red";
-        //     throw e;
-        // }
+        codeEditor.style.border = "3px solid green";
+        try {
+              always: {p1.left+p2.left == 2*m1.left};
+              always: {p1.top+p2.top == 2*m1.top};
+
+              always: {p2.left+p3.left == 2*m2.left};
+              always: {p2.top+p3.top == 2*m2.top};
+
+              always: {p3.left+p4.left == 2*m3.left};
+              always: {p3.top+p4.top == 2*m3.top};
+
+              always: {p4.left+p1.left == 2*m4.left};
+              always: {p4.top+p1.top == 2*m4.top};
+
+              stay: {
+                  // A hack to work around the split stay problem
+                  priority: "medium"
+                  p1.left && p1.top && p3.top && p3.left
+              }
+        } catch (e) {
+            codeEditor.style.border = "3px solid red";
+            throw e;
+        }
 
         // rerender for immediate changes
         canvas.renderAll();
